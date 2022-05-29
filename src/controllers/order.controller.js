@@ -43,7 +43,7 @@ exports.create_order = async (req, res, next) => {
 };
 
 exports.get_all_orders = async (req, res, next) => {
-  Order.query()
+  Order.query().withGraphFetched('[foodItems]')
     .then((result) => {
       res.status(200).json({
         count: result.length,
@@ -62,6 +62,7 @@ exports.update_order_status = async (req, res, next) => {
 
   Order.query()
     .patchAndFetchById(id, { status })
+    .withGraphFetched('[foodItems]')
     .throwIfNotFound({ message: "Order does not exist" })
     .then((data) => {
       res.status(200).json({
@@ -72,24 +73,5 @@ exports.update_order_status = async (req, res, next) => {
     .catch((error) => {
       next(error);
     });
-
-  // try {
-  //   const order = await Order.query().findById(id);
-  //   if(!order) throw new NotFoundException(`Order for id ${id} does not exist`)
-    
-  //   Order.query()
-  //     .then((result) => {
-  //       res.status(200).json({
-  //         count: result.length,
-  //         data: result,
-  //       });
-  //     })
-  //     .catch((error) => {
-  //       next(error);
-  //     });
-
-  // } catch (error) {
-  //   next(error);
-  // }
 
 };
