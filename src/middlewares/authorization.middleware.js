@@ -6,7 +6,7 @@ const env = require("../configs");
 
 const { getUser } = require("../services/auth.service");
 
-const AuthorizationMiddleware = (roleAllowed) => {
+const AuthorizationMiddleware = (rolesAllowed) => {
   return async (req, res, next) => {
     try {
       // Check for authorization header
@@ -25,8 +25,9 @@ const AuthorizationMiddleware = (roleAllowed) => {
       const user = await getUser("username", decoded.username);
 
       if (!user) throw new UnauthorizedException("Unauthorized! Please login to proceed.");
-
-      if (user.role != roleAllowed) throw new ForbiddenException();
+      
+      const validRole = rolesAllowed.includes(user.role);
+      if (!validRole) throw new ForbiddenException();
 
       req.user = user;
       next();

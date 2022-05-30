@@ -6,13 +6,14 @@ const { AuthorizationMiddleware } = require("../middlewares/authorization.middle
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { postFoodItem, patchFoodItem } = require("../validation/food-item.schema");
+const { roles } = require('../models/roles');
 
 const FoodItemRouter = express.Router();
 
 FoodItemRouter.get("/", getFoodItemsHandler());
-FoodItemRouter.post("/", AuthorizationMiddleware("admin"), ValidationMiddleware(postFoodItem), createFoodItemHandler());
-FoodItemRouter.patch("/:id", AuthorizationMiddleware("admin"), ValidationMiddleware(patchFoodItem), patchFoodItemHandler());
-FoodItemRouter.delete("/:id", AuthorizationMiddleware("admin"), deleteFoodItemsHandler());
+FoodItemRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postFoodItem), createFoodItemHandler());
+FoodItemRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchFoodItem), patchFoodItemHandler());
+FoodItemRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), deleteFoodItemsHandler());
 
 /**
  * @swagger

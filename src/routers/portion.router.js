@@ -1,14 +1,15 @@
 const router = require('express').Router();
 const portionController = require('../controllers/portion.controller');
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
+const { roles } = require('../models/roles');
 
 router.get('/', portionController.get_all_portions);
 
-router.post('/', AuthorizationMiddleware('admin'), portionController.create_portion);
+router.post('/', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), portionController.create_portion);
 
-router.patch('/:portionId', AuthorizationMiddleware('admin'),portionController.update_portion);
+router.patch('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]),portionController.update_portion);
 
-router.delete('/:portionId', AuthorizationMiddleware('admin'),portionController.delete_portion);
+router.delete('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]),portionController.delete_portion);
 
 /**
  * @swagger
