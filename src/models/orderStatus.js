@@ -1,7 +1,7 @@
 const orderStatus = Object.freeze({
   PENDING: 'pending',
   ACCEPTED: 'accepted',
-  DELIVERED: 'delivered',
+  COMPLETED: 'completed',
   CANCELLED: 'cancelled',
 });
 

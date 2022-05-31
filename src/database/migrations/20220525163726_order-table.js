@@ -3,7 +3,7 @@ const tableName = "order";
 exports.up = function (knex) {
   return knex.schema.createTable(tableName, (table) => {
     table.increments("id").primary();
-    table.string("type", 25).notNullable();
+    table.boolean("is_delivery").notNullable();
     table.integer("no_of_items").notNullable();
     table.decimal("total_price").notNullable();
     table.string("status").notNullable();

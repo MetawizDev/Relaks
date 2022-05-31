@@ -6,11 +6,12 @@ const authService = require('../services/auth.service');
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const orderStatus = require('../models/orderStatus');
 const roles = require('../models/roles');
+const ValidationException = require("../common/exceptions/ValidationException");
 
 exports.create_order = async (req, res, next) => {
   const userId = req.user.id;
 
-  const { type, noOfItems, totalPrice, location, foodItems } = req.body;
+  const { isDelivery, noOfItems, totalPrice, location, foodItems } = req.body;
   const { latitude, longitude } = location;
   const status = orderStatus.PENDING; // default status of an order when creating
 
@@ -28,7 +29,7 @@ exports.create_order = async (req, res, next) => {
 
   try {
     // populating from user side
-    const order = await User.relatedQuery('orders').for(userId).insert({ type, noOfItems, totalPrice, latitude, longitude, status });
+    const order = await User.relatedQuery('orders').for(userId).insert({ isDelivery, noOfItems, totalPrice, latitude, longitude, status });
     // making a relation from food item side
     for(const { id, quantity } of foodItems) {
       await FoodItem.relatedQuery('orders').for(id).relate({id: order.id, quantity});
@@ -110,20 +111,37 @@ exports.get_all_orders = async (req, res, next) => {
 exports.update_order_status = async (req, res, next) => {
   const id = req.params.orderId;
 
-  const status = req.body.status;
+  const newStatus = req.body.status;
 
-  Order.query()
-    .patchAndFetchById(id, { status })
-    .withGraphFetched('[foodItems]')
-    .throwIfNotFound({ message: "Order does not exist" })
-    .then((data) => {
-      res.status(200).json({
-        message: "Order updated successfully",
-        data,
+  const { status: oldStatus } = await Order.query()
+                        .findById(id)
+                        .throwIfNotFound({ message: "Order does not exist" });
+
+  let isValidTransition = false;
+  if(oldStatus === orderStatus.PENDING && 
+    (newStatus === orderStatus.ACCEPTED || newStatus === orderStatus.CANCELLED)) {
+      isValidTransition = true;
+  } else if(oldStatus === orderStatus.ACCEPTED && 
+    (newStatus === orderStatus.COMPLETED || newStatus === orderStatus.CANCELLED)) {
+      isValidTransition = true;
+  } 
+
+  if(isValidTransition) {
+    Order.query()
+      .patchAndFetchById(id, { newStatus })
+      .withGraphFetched('[foodItems]')
+      .then((data) => {
+        res.status(200).json({
+          message: "Order updated successfully",
+          data,
+        });
+      })
+      .catch((error) => {
+        next(error);
       });
-    })
-    .catch((error) => {
-      next(error);
-    });
+  } else {
+    throw new ValidationException(`Invalid status. Cannot transition from ${oldStatus} to ${newStatus}`)
+  }
+
 
 };
