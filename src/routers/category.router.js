@@ -4,14 +4,15 @@ const { AuthorizationMiddleware } = require("../middlewares/authorization.middle
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { postCategory, patchCategory } = require("../validation/category.schema");
+const roles = require('../models/roles');
 
 const CategoryRouter = express.Router();
 
 // Category Routers
 CategoryRouter.get("/", getAllCategoriesHandler());
-CategoryRouter.post("/", AuthorizationMiddleware("admin"), ValidationMiddleware(postCategory), postCategoryHandler());
-CategoryRouter.patch("/:id", AuthorizationMiddleware("admin"), ValidationMiddleware(patchCategory), patchCategoryHandler());
-CategoryRouter.delete("/:id", AuthorizationMiddleware("admin"), deleteCategoryHandler());
+CategoryRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postCategory), postCategoryHandler());
+CategoryRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchCategory), patchCategoryHandler());
+CategoryRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), deleteCategoryHandler());
 
 /**
  * @swagger

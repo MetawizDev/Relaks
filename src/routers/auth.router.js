@@ -7,12 +7,13 @@ const userController = require("../controllers/user.controller");
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { registerUser, loginUser } = require("../validation/user.schema");
+const roles = require('../models/roles');
 
 const AuthRouter = express.Router();
 
 // Register Routers
-AuthRouter.post("/admin/register", ValidationMiddleware(registerUser), userRegisterHandler("admin"));
-AuthRouter.post("/customer/register", ValidationMiddleware(registerUser), userRegisterHandler("customer"));
+AuthRouter.post("/manager/register", ValidationMiddleware(registerUser), userRegisterHandler(roles.MANAGER));
+AuthRouter.post("/customer/register", ValidationMiddleware(registerUser), userRegisterHandler(roles.CUSTOMER));
 AuthRouter.post("/login", ValidationMiddleware(loginUser), userLoginHandler());
 
 // facebook auth related

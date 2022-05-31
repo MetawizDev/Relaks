@@ -1,3 +1,5 @@
+const roles = require('../../models/roles');
+
 exports.seed = function (knex) {
   // Deletes ALL existing entries
   return knex("user")
@@ -5,8 +7,9 @@ exports.seed = function (knex) {
     .then(function () {
       // Inserts seed entries
       return knex("user").insert([
-        { first_name: "admin", last_name: "admin", email: "admin@cafeapp.com", username: "admin@cafeapp.com", password: "$2a$12$G0AwSHUELJZjxWfXgkPdQOT6rkW.JHajj69bVzPECjua8erv0YJky", mobile: "0771234567", role: "admin" },
-        { first_name: "customer", last_name: "customer", email: "customer@cafeapp.com", username: "customer@cafeapp.com", password: "$2a$12$G0AwSHUELJZjxWfXgkPdQOT6rkW.JHajj69bVzPECjua8erv0YJky", mobile: "0711234567", role: "customer" },
+        { first_name: "manager", last_name: "manager", email: "manager@cafeapp.com", username: "manager@cafeapp.com", password: "$2a$12$G0AwSHUELJZjxWfXgkPdQOT6rkW.JHajj69bVzPECjua8erv0YJky", mobile: "0771234567", role: roles.OWNER },
+        { first_name: "customer", last_name: "customer", email: "customer@cafeapp.com", username: "customer@cafeapp.com", password: "$2a$12$G0AwSHUELJZjxWfXgkPdQOT6rkW.JHajj69bVzPECjua8erv0YJky", mobile: "0711234567", role: roles.CUSTOMER },
+        { first_name: "customer2", last_name: "customer2", email: "customer2@cafeapp.com", username: "customer2@cafeapp.com", password: "$2a$12$G0AwSHUELJZjxWfXgkPdQOT6rkW.JHajj69bVzPECjua8erv0YJky", mobile: "0721234567", role: roles.CUSTOMER },
       ]);
     });
 };
