@@ -1,13 +1,15 @@
-const router = require('express').Router();
-const orderController = require('../controllers/order.controller');
+const router = require("express").Router();
+const orderController = require("../controllers/order.controller");
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 const roles = require('../models/roles');
+const ValidationMiddleware = require("../middlewares/validation.middleware");
+const { postOrder, patchOrder } = require("../validation/order.schema");
 
 router.get('/', AuthorizationMiddleware([roles.OWNER, roles.MANAGER, roles.CUSTOMER]), orderController.get_all_orders);
 
-router.post('/', AuthorizationMiddleware([roles.CUSTOMER]), orderController.create_order);
+router.post('/', AuthorizationMiddleware([roles.CUSTOMER]), ValidationMiddleware(postOrder), orderController.create_order);
 
-router.patch('status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), orderController.update_order_status);
+router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchOrder), orderController.update_order_status);
 
 /**
  * @swagger
@@ -35,7 +37,7 @@ router.patch('status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANA
  *          updatedAt:
  *            type: string
  *            description: Updated date and time
- * 
+ *
  *      FoodItemRequest:
  *        type: object
  *        required:
@@ -48,7 +50,7 @@ router.patch('status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANA
  *          quantity:
  *            type: integer
  *            description: No of food items in the given id
- * 
+ *
  *      Order:
  *        type: object
  *        required:
@@ -119,13 +121,13 @@ router.patch('status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANA
  *              oneOf:
  *                - $ref: '#/components/schemas/FoodItemRequest'
  *                - $ref: '#/components/schemas/FoodItemRequest'
- *  
- * 
+ *
+ *
  *   securitySchemes:
  *     BearerAuth:
  *       type: http
  *       scheme: bearer
- * 
+ *
  *     ApiKeyAuth:
  *       type: apiKey
  *       in: header
@@ -137,16 +139,16 @@ router.patch('status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANA
  * /api/v1/orders:
  *  get:
  *    summary: Get all the orders
- *    tags: 
+ *    tags:
  *      - orders
- *    responses: 
- *      '200': 
+ *    responses:
+ *      '200':
  *        content:
- *          'application/json': 
- *             schema: 
+ *          'application/json':
+ *             schema:
  *               type: object
  *               properties:
- *                 count: 
+ *                 count:
  *                   type: integer
  *                   example: 2
  *                 data:
@@ -155,27 +157,27 @@ router.patch('status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANA
  *                     oneOf:
  *                       - $ref: '#/components/schemas/Order'
  *                       - $ref: '#/components/schemas/Order'
- *                    
+ *
  *  post:
  *    summary: Create an order
- *    security: 
+ *    security:
  *      - ApiKeyAuth: []
- *    tags: 
+ *    tags:
  *      - orders
  *    requestBody:
  *      required: true
- *      content: 
+ *      content:
  *        application/json:
  *          schema:
  *            $ref: '#/components/schemas/OrderRequest'
- *    responses: 
- *      '201': 
+ *    responses:
+ *      '201':
  *        content:
- *          'application/json': 
- *              schema: 
+ *          'application/json':
+ *              schema:
  *               type: object
  *               properties:
- *                 message: 
+ *                 message:
  *                   type: string
  *                   example: Order created successfully
  *                 success:
@@ -183,24 +185,24 @@ router.patch('status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANA
  *                   example: true
  *                 data:
  *                   $ref: '#/components/schemas/Order'
- *                   
+ *
  * /api/v1/orders/{id}:
  *  patch:
  *    summary: Update order status
- *    security: 
+ *    security:
  *      - ApiKeyAuth: []
  *    tags:
  *      - orders
  *    parameters:
  *      - in: path
  *        name: id
- *        schema: 
+ *        schema:
  *          type: string
  *        required: true
  *        description: Id of the order
  *    requestBody:
  *      required: true
- *      content: 
+ *      content:
  *        application/json:
  *          schema:
  *            type: object
@@ -210,20 +212,20 @@ router.patch('status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANA
  *              status:
  *                type: string
  *                description: status of the order
- *    responses: 
- *      '200': 
+ *    responses:
+ *      '200':
  *        content:
- *          'application/json': 
- *              schema: 
+ *          'application/json':
+ *              schema:
  *               type: object
  *               properties:
- *                 message: 
+ *                 message:
  *                   type: string
  *                   example: Order updated successfully
  *                 data:
  *                   $ref: '#/components/schemas/Order'
- * 
- * 
+ *
+ *
  */
 
 module.exports = router;

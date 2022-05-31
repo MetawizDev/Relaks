@@ -1,15 +1,17 @@
-const router = require('express').Router();
-const portionController = require('../controllers/portion.controller');
+const router = require("express").Router();
+const portionController = require("../controllers/portion.controller");
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 const roles = require('../models/roles');
+const ValidationMiddleware = require("../middlewares/validation.middleware");
+const { postPortion, patchPortion } = require("../validation/portion.schema");
 
-router.get('/', portionController.get_all_portions);
+router.get("/", portionController.get_all_portions);
 
-router.post('/', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), portionController.create_portion);
+router.post('/', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postPortion), portionController.create_portion);
 
-router.patch('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]),portionController.update_portion);
+router.patch('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchPortion), portionController.update_portion);
 
-router.delete('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]),portionController.delete_portion);
+router.delete('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), portionController.delete_portion);
 
 /**
  * @swagger
@@ -37,12 +39,12 @@ router.delete('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER
  *          name: Medium
  *          createdAt: 2022-05-29 08:21:59
  *          updatedAt: 2022-05-29 08:21:59
- *  
+ *
  *   securitySchemes:
  *     BearerAuth:
  *       type: http
  *       scheme: bearer
- * 
+ *
  *     ApiKeyAuth:
  *       type: apiKey
  *       in: header
@@ -54,16 +56,16 @@ router.delete('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER
  * /api/v1/portions:
  *  get:
  *    summary: Get all the portions
- *    tags: 
+ *    tags:
  *      - portions
- *    responses: 
- *      '200': 
+ *    responses:
+ *      '200':
  *        content:
- *          'application/json': 
- *             schema: 
+ *          'application/json':
+ *             schema:
  *               type: object
  *               properties:
- *                 count: 
+ *                 count:
  *                   type: integer
  *                   example: 2
  *                 data:
@@ -72,12 +74,12 @@ router.delete('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER
  *                     oneOf:
  *                       - $ref: '#/components/schemas/Portion'
  *                       - $ref: '#/components/schemas/Portion'
- *                    
+ *
  *  post:
  *    summary: Create a portion
- *    security: 
+ *    security:
  *      - ApiKeyAuth: []
- *    tags: 
+ *    tags:
  *      - portions
  *    parameters:
  *      - in: body
@@ -88,14 +90,14 @@ router.delete('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER
  *          name:
  *            type: string
  *            description: Name of the portion
- *    responses: 
- *      '201': 
+ *    responses:
+ *      '201':
  *        content:
- *          'application/json': 
- *              schema: 
+ *          'application/json':
+ *              schema:
  *               type: object
  *               properties:
- *                 message: 
+ *                 message:
  *                   type: string
  *                   example: Portion created successfully
  *                 success:
@@ -103,24 +105,24 @@ router.delete('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER
  *                   example: true
  *                 data:
  *                   $ref: '#/components/schemas/Portion'
- *                   
+ *
  * /api/v1/portions/{id}:
  *  patch:
  *    summary: Update a portion
- *    security: 
+ *    security:
  *      - ApiKeyAuth: []
  *    tags:
  *      - portions
  *    parameters:
  *      - in: path
  *        name: id
- *        schema: 
+ *        schema:
  *          type: string
  *        required: true
  *        description: Id of the portion
  *    requestBody:
  *      required: true
- *      content: 
+ *      content:
  *        application/json:
  *          schema:
  *            type: object
@@ -130,45 +132,45 @@ router.delete('/:portionId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER
  *              name:
  *                type: string
  *                description: New name of the portion
- *    responses: 
- *      '200': 
+ *    responses:
+ *      '200':
  *        content:
- *          'application/json': 
- *              schema: 
+ *          'application/json':
+ *              schema:
  *               type: object
  *               properties:
- *                 message: 
+ *                 message:
  *                   type: string
  *                   example: Portion updated successfully
  *                 data:
  *                   $ref: '#/components/schemas/Portion'
- * 
+ *
  *  delete:
  *    summary: Delete a portion
- *    security: 
+ *    security:
  *      - ApiKeyAuth: []
  *    tags:
  *      - portions
  *    parameters:
  *      - in: path
  *        name: id
- *        schema: 
+ *        schema:
  *          type: string
  *        required: true
  *        description: Id of the portion
- *    responses: 
- *      '200': 
+ *    responses:
+ *      '200':
  *        content:
- *          'application/json': 
- *             schema: 
+ *          'application/json':
+ *             schema:
  *               type: object
  *               properties:
- *                 message: 
+ *                 message:
  *                   type: string
  *                   example: Portion deleted successfully
  *                 data:
  *                   $ref: '#/components/schemas/Portion'
- * 
+ *
  */
 
 module.exports = router;
