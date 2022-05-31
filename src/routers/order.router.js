@@ -7,7 +7,7 @@ router.get('/', AuthorizationMiddleware([roles.OWNER, roles.MANAGER, roles.CUSTO
 
 router.post('/', AuthorizationMiddleware([roles.CUSTOMER]), orderController.create_order);
 
-router.patch('/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), orderController.update_order_status);
+router.patch('status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), orderController.update_order_status);
 
 /**
  * @swagger

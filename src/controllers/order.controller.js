@@ -11,6 +11,7 @@ exports.create_order = async (req, res, next) => {
   const userId = req.user.id;
 
   const { type, noOfItems, totalPrice, location, foodItems } = req.body;
+  const { latitude, longitude } = location;
   const status = orderStatus.PENDING; // default status of an order when creating
 
   // checking if fooditem ids are valid
@@ -27,7 +28,7 @@ exports.create_order = async (req, res, next) => {
 
   try {
     // populating from user side
-    const order = await User.relatedQuery('orders').for(userId).insert({ type, noOfItems, totalPrice, location, status });
+    const order = await User.relatedQuery('orders').for(userId).insert({ type, noOfItems, totalPrice, latitude, longitude, status });
     // making a relation from food item side
     for(const { id, quantity } of foodItems) {
       await FoodItem.relatedQuery('orders').for(id).relate({id: order.id, quantity});
@@ -46,7 +47,7 @@ exports.create_order = async (req, res, next) => {
 exports.get_all_orders = async (req, res, next) => {
   const status = req.query.status;
   const { id, role } = req.user;
-  
+
   if(role === roles.CUSTOMER) {
     if(status) {
       Order.query()

@@ -7,7 +7,8 @@ exports.up = function (knex) {
     table.integer("no_of_items").notNullable();
     table.decimal("total_price").notNullable();
     table.string("status").notNullable();
-    table.string("location").notNullable();
+    table.decimal("latitude").notNullable();
+    table.decimal("longitude").notNullable();
     table.integer("user_id").unsigned().notNullable().references("id").inTable("user");
 
     // timestamps
