@@ -4,7 +4,7 @@ const { AuthorizationMiddleware } = require("../middlewares/authorization.middle
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { postCategory, patchCategory } = require("../validation/category.schema");
-const { roles } = require('../models/roles');
+const roles = require('../models/roles');
 
 const CategoryRouter = express.Router();
 

@@ -3,7 +3,7 @@ const strategy = require('passport-facebook');
 const UnauthorizedException = require('../common/exceptions/UnauthorizedException');
 const { getUser } = require("../services/auth.service");
 const User = require('../models/user.model');
-const { roles } = require('../models/roles');
+const roles = require('../models/roles');
 
 const FacebookStrategy = strategy.Strategy;
 

@@ -7,7 +7,7 @@ const userController = require("../controllers/user.controller");
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { registerUser, loginUser } = require("../validation/user.schema");
-const { roles } = require('../models/roles');
+const roles = require('../models/roles');
 
 const AuthRouter = express.Router();
 

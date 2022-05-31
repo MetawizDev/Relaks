@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const portionController = require('../controllers/portion.controller');
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
-const { roles } = require('../models/roles');
+const roles = require('../models/roles');
 
 router.get('/', portionController.get_all_portions);
 

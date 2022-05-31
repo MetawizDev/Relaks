@@ -1,9 +1,9 @@
 const router = require('express').Router();
 const orderController = require('../controllers/order.controller');
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
-const { roles } = require('../models/roles');
+const roles = require('../models/roles');
 
-router.get('/', orderController.get_all_orders);
+router.get('/', AuthorizationMiddleware([roles.OWNER, roles.MANAGER, roles.CUSTOMER]), orderController.get_all_orders);
 
 router.post('/', AuthorizationMiddleware([roles.CUSTOMER]), orderController.create_order);
 

@@ -1,4 +1,4 @@
-const { roles } = require('../../models/roles');
+const roles = require('../../models/roles');
 
 exports.seed = function (knex) {
   // Deletes ALL existing entries

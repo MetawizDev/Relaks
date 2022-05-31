@@ -6,8 +6,6 @@ const authService = require('../services/auth.service');
 const NotFoundException = require("../common/exceptions/NotFoundException");
 
 exports.create_order = async (req, res, next) => {
-  req.user = {id: 1};
-
   const userId = req.user.id;
 
   const { type, noOfItems, totalPrice, location, status, foodItems } = req.body;

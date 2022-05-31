@@ -6,7 +6,7 @@ const { AuthorizationMiddleware } = require("../middlewares/authorization.middle
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { postFoodItem, patchFoodItem } = require("../validation/food-item.schema");
-const { roles } = require('../models/roles');
+const roles = require('../models/roles');
 
 const FoodItemRouter = express.Router();
 
