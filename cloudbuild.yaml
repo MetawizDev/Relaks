@@ -1,0 +1,22 @@
+steps:
+  - name: "gcr.io/cloud-builders/npm"
+    args: ["install"]
+  - name: "gcr.io/cloud-builders/npm"
+    args: ["run", "create-env"]
+    env:
+      - "SECRET=somesecret"
+      - "TOKEN_VALIDITY=7d"
+      - "PORT=3000"
+      - "DB_HOST=34.100.151.19"
+      - "DB_PORT=3306"
+      - "DB_USER=root"
+      - "DB_PASSWORD=stellairelabs"
+      - "DB_NAME=cafe-app"
+      - "FACEBOOK_CLIENT_ID=1428773184212219"
+      - "FACEBOOK_CLIENT_SECRET=e522325b714406d00bd5632adfd25fed"
+      - "FACEBOOK_CALLBACK_URL=http://localhost:3000/auth/facebook/callback"
+      - "SESSION_KEY=my_secret"
+
+  - name: "gcr.io/cloud-builders/gcloud"
+    args: ["app", "deploy"]
+timeout: "1600s"
