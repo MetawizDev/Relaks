@@ -1,5 +1,5 @@
 const express = require("express");
-const { userRegisterHandler, userLoginHandler, facebookSuccessLoginHandler } = require("../controllers/auth.controller");
+const { userRegisterHandler, userLoginHandler, facebookSuccessLoginHandler, userUpdateHandler } = require("../controllers/auth.controller");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
@@ -8,13 +8,21 @@ const userController = require("../controllers/user.controller");
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { registerUser, loginUser } = require("../validation/user.schema");
 const roles = require("../models/roles");
+const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 
 const AuthRouter = express.Router();
 
 // Register Routers
 AuthRouter.post("/manager/register", ValidationMiddleware(registerUser), userRegisterHandler(roles.MANAGER));
 AuthRouter.post("/customer/register", ValidationMiddleware(registerUser), userRegisterHandler(roles.CUSTOMER));
+
+// Login routers
 AuthRouter.post("/login", ValidationMiddleware(loginUser), userLoginHandler());
+
+// Update user routers
+AuthRouter.patch("/me", AuthorizationMiddleware([roles.OWNER, roles.MANAGER, roles.CUSTOMER]), userUpdateHandler());
+
+// Delete user routers
 
 // facebook auth related
 AuthRouter.get("/facebook", passport.authenticate("facebook", { scope: ["email"] }));

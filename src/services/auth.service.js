@@ -11,6 +11,10 @@ const createUser = async (data) => {
   return user;
 };
 
+const updateUser = async (id, data) => {
+  return await User.query().findById(id).patch(data);
+};
+
 const comparePassword = async (password, hash) => {
   return await bcrypt.compare(password, hash);
 };
@@ -19,4 +23,5 @@ module.exports = {
   getUser,
   createUser,
   comparePassword,
+  updateUser,
 };
