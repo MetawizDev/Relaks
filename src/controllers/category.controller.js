@@ -1,12 +1,18 @@
 const ConflictException = require("../common/exceptions/ConflictException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
-const { getAllCategories, createCategory, patchCategory, deleteCategory, getCategory, getFoodItemsOfCategory } = require("../services/category.service");
+const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
+const { getAllCategories, createCategory, patchCategory, deleteCategory, getCategory, getFoodItemsOfCategory, getSomeCategories } = require("../services/category.service");
 
 const getAllCategoriesHandler = () => {
   return async (req, res, next) => {
     try {
+      let categories;
+
       // Get all categories
-      const categories = await getAllCategories();
+      if (!req.query.limit) categories = await getAllCategories();
+      //   Get specific food items in a category when specified as query params
+      else if (req.query.limit < 0) throw new NotAcceptableException("Category limit should be non negative!");
+      else categories = await getSomeCategories(req.query.limit);
 
       res.status(200).json({
         message: "Categories fetched succefully",

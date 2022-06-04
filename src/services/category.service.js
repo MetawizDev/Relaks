@@ -4,6 +4,9 @@ const getAllCategories = async () => {
   return await Category.query();
 };
 
+const getSomeCategories = async (limit) => {
+  return await Category.query().limit(limit);
+};
 const createCategory = async (data) => {
   const category = await Category.query().insert(data);
   return category;
@@ -34,4 +37,5 @@ module.exports = {
   patchCategory,
   deleteCategory,
   getFoodItemsOfCategory,
+  getSomeCategories,
 };

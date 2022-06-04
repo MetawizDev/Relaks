@@ -35,9 +35,17 @@ module.exports = CategoryRouter;
  *          summary: Get all categories - public
  *          tags:
  *              - category
+ *          parameters:
+ *              -   in : query
+ *                  name : limit
+ *                  description: no of categories to be feeched
+ *                  schema:
+ *                      type: integer
  *          responses:
  *              200:
  *                  description: List of category objects
+ *              406:
+ *                  description: Category limit is invalid
  *
  *      post:
  *          summary: Create new category - owner, manager
