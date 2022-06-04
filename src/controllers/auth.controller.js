@@ -5,7 +5,7 @@ const env = require("../configs");
 const ConflictException = require("../common/exceptions/ConflictException");
 const UnauthorizedException = require("../common/exceptions/UnauthorizedException");
 
-const { getUser, createUser, comparePassword } = require("../services/auth.service");
+const { getUser, createUser, comparePassword, updateUser } = require("../services/auth.service");
 
 const userRegisterHandler = (role) => {
   return async (req, res, next) => {
@@ -36,7 +36,7 @@ const userLoginHandler = () => {
       // Get the user from database
       const user = await getUser("username", req.body.email);
 
-      // Check if the user exits
+      // Check if the user exists
       if (!user) throw new UnauthorizedException("Invalid email or password!");
 
       // Check if the password match
@@ -66,6 +66,22 @@ const userLoginHandler = () => {
   };
 };
 
+const userUpdateHandler = () => {
+  return async (req, res, next) => {
+    try {
+      const user = await updateUser(req.user.id, req.body);
+
+      res.status(200).json({
+        message: `User update successful!`,
+        success: true,
+        data: user,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 const facebookSuccessLoginHandler = (req, res, next) => {
   if (!req.user) {
     return res.status(401).json({ message: "you are not logged in" });
@@ -84,4 +100,5 @@ module.exports = {
   userRegisterHandler,
   userLoginHandler,
   facebookSuccessLoginHandler,
+  userUpdateHandler,
 };

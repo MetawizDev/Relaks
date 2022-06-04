@@ -8,7 +8,14 @@ class User extends Model {
 
   async $beforeInsert() {
     // facebook users dont have a password
-    if(this.password) {
+    if (this.password) {
+      const salt = await bcrypt.genSalt();
+      this.password = await bcrypt.hash(this.password, salt);
+    }
+  }
+
+  async $beforeUpdate() {
+    if (this.password) {
       const salt = await bcrypt.genSalt();
       this.password = await bcrypt.hash(this.password, salt);
     }
