@@ -20,29 +20,24 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *        required:
  *          - id
  *          - quantity
+ *          - portionId
  *        properties:
  *          id:
  *            type: integer
  *            description: Id of the food item
- *          name:
- *            type: string
- *          categoryId:
- *            type: integer
  *          quantity:
  *            type: integer
  *            description: No of food items in the given id
- *          createdAt:
- *            type: string
- *            description: Created date and time
- *          updatedAt:
- *            type: string
- *            description: Updated date and time
+ *          portionId:
+ *            type: integer
+ *            description: Id of the portion
  *
  *      FoodItemRequest:
  *        type: object
  *        required:
  *          - id
  *          - quantity
+ *          - portionId
  *        properties:
  *          id:
  *            type: integer
@@ -50,6 +45,9 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *          quantity:
  *            type: integer
  *            description: No of food items in the given id
+ *          portionId:
+ *            type: integer
+ *            description: Id of the portion
  *
  *      Order:
  *        type: object
@@ -57,9 +55,10 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *          - type
  *          - noOfItems
  *          - totalPrice
- *          - location
  *          - status
  *          - foodItems
+ *          - latitude
+ *          - longitude
  *        properties:
  *          id:
  *            type: integer
@@ -71,9 +70,10 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *            type: string
  *          totalPrice:
  *            type: string
- *          location:
+ *          latitude:
  *            type: string
- *            description: Location of the person
+ *          longitude:
+ *            type: string
  *          status:
  *            type: string
  *            description: pending, prepared, cancelled
@@ -109,8 +109,7 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *          totalPrice:
  *            type: string
  *          location:
- *            type: string
- *            description: Location of the person
+ *            $ref: '#/components/schemas/Location'
  *          status:
  *            type: string
  *            description: pending, prepared, cancelled
@@ -121,7 +120,16 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *              oneOf:
  *                - $ref: '#/components/schemas/FoodItemRequest'
  *                - $ref: '#/components/schemas/FoodItemRequest'
- *
+ *      Location:
+ *        type: object
+ *        required:
+ *          - latitude
+ *          - longitude
+ *        properties:
+ *          latitude:
+ *            type: string
+ *          longitude:
+ *            type: string
  *
  *   securitySchemes:
  *     BearerAuth:
@@ -186,7 +194,7 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *                 data:
  *                   $ref: '#/components/schemas/Order'
  *
- * /api/v1/orders/{id}:
+ * /api/v1/orders/status/{id}:
  *  patch:
  *    summary: Update order status
  *    security:
