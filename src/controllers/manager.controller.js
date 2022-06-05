@@ -1,6 +1,6 @@
 const { getAllManagers, deleteManager } = require("../services/manager.service");
 const { getUser } = require("../services/auth.service");
-const ConflictException = require("../common/exceptions/ConflictException");
+const NotFoundException = require("../common/exceptions/NotFoundException");
 const roles = require("../models/roles");
 
 const getAllManagersHandler = () => {
@@ -28,7 +28,7 @@ const deleteManagerHandler = () => {
       const manager = await getUser("id", managerId);
 
       // Check of user role is manager or manager exist
-      if (!manager || manager.role != roles.MANAGER) throw new ConflictException("Manager does not exist!");
+      if (!manager || manager.role != roles.MANAGER) throw new NotFoundException("Manager does not exist!");
 
       // Delete manager
       await deleteManager(managerId);
