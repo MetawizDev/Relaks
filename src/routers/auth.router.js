@@ -22,8 +22,6 @@ AuthRouter.post("/login", ValidationMiddleware(loginUser), userLoginHandler());
 // Update user routers
 AuthRouter.patch("/me", AuthorizationMiddleware([roles.OWNER, roles.MANAGER, roles.CUSTOMER]), userUpdateHandler());
 
-// Delete user routers
-
 // facebook auth related
 AuthRouter.get("/facebook", passport.authenticate("facebook", { scope: ["email"] }));
 
