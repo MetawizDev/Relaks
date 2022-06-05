@@ -1,4 +1,4 @@
-const tableName = "order_has_food_item";
+const tableName = "order_has_food_item_has_portion";
 
 exports.up = function (knex) {
   return knex.schema.createTable(tableName, (table) => {
@@ -6,6 +6,7 @@ exports.up = function (knex) {
     table.integer("food_item_id").unsigned().notNullable().references("id").inTable("food_item");
     table.integer("quantity").unsigned().notNullable();
     table.integer("order_id").unsigned().notNullable().references("id").inTable("order");
+    table.integer("portion_id").unsigned().notNullable().references("id").inTable("portion");
 
     // timestamps
     table.timestamps(true, true);

@@ -17,8 +17,8 @@ class FoodItem extends Model {
         join: {
           from: 'food_item.id',
           through: {          
-            from: 'order_has_food_item.food_item_id',
-            to: 'order_has_food_item.order_id',
+            from: 'order_has_food_item_has_portion.food_item_id',
+            to: 'order_has_food_item_has_portion.order_id',
             extra: ['quantity']
           },
           to: 'order.id',
