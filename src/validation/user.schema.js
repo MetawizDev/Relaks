@@ -5,7 +5,9 @@ const Schema = {
     firstName: Joi.string().alphanum().min(3).max(25).required(),
     lastName: Joi.string().alphanum().min(3).max(25).required(),
     email: Joi.string().email().max(255).required(),
-    password: Joi.string().pattern(new RegExp("^(?=.*d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$")).required(),
+    password: Joi.string()
+      .pattern(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,64})/)
+      .required(),
     mobile: Joi.string().pattern(new RegExp("^[0-9]{10}$")).required(),
   }),
   loginUser: Joi.object({
