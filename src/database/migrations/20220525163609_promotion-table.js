@@ -6,7 +6,7 @@ exports.up = function (knex) {
     table.string("description").notNullable();
     table.boolean("is_delivery").notNullable();
     table.decimal("discount").notNullable();
-    table.date("expiry_date");
+    // table.date("expiry_date");
 
     // timestamps
     table.timestamps(true, true);

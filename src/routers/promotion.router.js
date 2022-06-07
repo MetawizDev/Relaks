@@ -1,0 +1,130 @@
+const express = require("express");
+const { postPromotionHandler, getAllPromotionsHandler, deletePromotionHandler, updatePromotionHandler } = require("../controllers/promotion.controller");
+
+const PromotionRouter = express.Router();
+
+PromotionRouter.get("/", getAllPromotionsHandler());
+PromotionRouter.post("/", postPromotionHandler());
+PromotionRouter.patch("/:id", updatePromotionHandler());
+PromotionRouter.delete("/:id", deletePromotionHandler());
+
+module.exports = PromotionRouter;
+
+/**
+ * @swagger
+ *components:
+ *  schemas:
+ *      Promotion:
+ *          type: object
+ *          properties:
+ *              description:
+ *                  type: string
+ *                  description: description of the promotion
+ *              isDelivery:
+ *                  type: boolean
+ *                  description: true if delivery, false if pickup
+ *              discount:
+ *                  type: number
+ *                  description: discount percentage
+ *              promotionItems:
+ *                  type: array
+ *                  items:
+ *                      type: object
+ *                      properties:
+ *                          foodItemId:
+ *                              type: integer
+ *                          portionId:
+ *                              type: integer
+ *                          quantity:
+ *                              type: integer
+ */
+
+/**
+ * @swagger
+ * /api/v1/promotions:
+ *      get:
+ *          summary: Get all promotions - public
+ *          tags:
+ *              -   Promotions
+ *          responses:
+ *              200:
+ *                  description: List of food item objects
+ *
+ *      post:
+ *          summary: Create new promotion - owner, manager
+ *          tags:
+ *              -   Promotions
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Promotion'
+ *          responses:
+ *              201:
+ *                  description: New promotion created
+ *              404:
+ *                  description: Fooditem or portion not found
+ *              400:
+ *                  description: Request body validation failed
+ *              403:
+ *                  description: No access rights
+ *              401:
+ *                  description: Authentication failed
+ *
+ * /api/v1/promotions/{id}:
+ *      patch:
+ *          summary: Update promotion - owner, manager
+ *          tags:
+ *              -   Promotions
+ *          parameters:
+ *              -   in : path
+ *                  name : id
+ *                  required: true
+ *                  description: promotion id
+ *                  schema:
+ *                      type: integer
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Promotion'
+ *          responses:
+ *              200:
+ *                  description: Promotion updated
+ *              406:
+ *                  description: Invalid query parameter
+ *              404:
+ *                  description: Promotion, fooditem, portion not found
+ *              400:
+ *                  description: Request body validation failed
+ *              403:
+ *                  description: No access rights
+ *              401:
+ *                  description: Authentication failed
+ *
+ *
+ *      delete:
+ *          summary: Delete a promotion - owner, manager
+ *          tags:
+ *              -   Promotions
+ *          parameters:
+ *              -   in : path
+ *                  name : id
+ *                  required: true
+ *                  description: food item id
+ *                  schema:
+ *                      type: integer
+ *          responses:
+ *              200:
+ *                  description: Deleted category object
+ *              406:
+ *                  description: Invalid query parameter
+ *              404:
+ *                  description: Promotion not found
+ *              403:
+ *                  description: No access rights
+ *              401:
+ *                  description: Authentication failed
+ */

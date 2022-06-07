@@ -39,7 +39,7 @@ class Portion extends Model {
           to: "order.id",
         },
       },
-      orders: {
+      promotions: {
         relation: Model.ManyToManyRelation,
         modelClass: Promotion,
         join: {

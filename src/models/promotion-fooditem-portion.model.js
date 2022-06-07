@@ -15,16 +15,16 @@ class PromotionFooditemPortion extends Model {
     const Portion = require("./portion.model");
 
     return {
-      orders: {
+      promotion: {
         relation: Model.BelongsToOneRelation,
-        modelClass: Order,
+        modelClass: Promotion,
         join: {
           from: "promotion_has_food_item_has_portion.promotion_id",
-          to: "order.id",
+          to: "promotion.id",
         },
       },
 
-      foodItems: {
+      foodItem: {
         relation: Model.BelongsToOneRelation,
         modelClass: FoodItem,
         join: {
@@ -33,7 +33,7 @@ class PromotionFooditemPortion extends Model {
         },
       },
 
-      portions: {
+      portion: {
         relation: Model.BelongsToOneRelation,
         modelClass: Portion,
         join: {
@@ -45,4 +45,4 @@ class PromotionFooditemPortion extends Model {
   }
 }
 
-module.exports = OrderFooditemPortion;
+module.exports = PromotionFooditemPortion;
