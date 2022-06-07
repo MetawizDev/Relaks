@@ -1,12 +1,16 @@
 const express = require("express");
 const { postPromotionHandler, getAllPromotionsHandler, deletePromotionHandler, updatePromotionHandler } = require("../controllers/promotion.controller");
+const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
+const ValidationMiddleware = require("../middlewares/validation.middleware");
+const { postPromotion, patchPromotion } = require("../validation/promotion.schema");
+const roles = require("../models/roles");
 
 const PromotionRouter = express.Router();
 
 PromotionRouter.get("/", getAllPromotionsHandler());
-PromotionRouter.post("/", postPromotionHandler());
-PromotionRouter.patch("/:id", updatePromotionHandler());
-PromotionRouter.delete("/:id", deletePromotionHandler());
+PromotionRouter.post("/", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), ValidationMiddleware(postPromotion), postPromotionHandler());
+PromotionRouter.patch("/:id", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), ValidationMiddleware(patchPromotion), updatePromotionHandler());
+PromotionRouter.delete("/:id", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), deletePromotionHandler());
 
 module.exports = PromotionRouter;
 
