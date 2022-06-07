@@ -30,6 +30,7 @@ class User extends Model {
 
   static get relationMappings() {
     const Order = require("./order.model");
+    const Table = require("./table.model");
 
     return {
       orders: {
@@ -38,6 +39,14 @@ class User extends Model {
         join: {
           from: "user.id",
           to: "order.user_id",
+        },
+      },
+      tables: {
+        relation: Model.HasManyRelation,
+        modelClass: Table,
+        join: {
+          from: "user.id",
+          to: "table.user_id",
         },
       },
     };
