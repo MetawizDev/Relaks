@@ -138,4 +138,10 @@ module.exports = AuthRouter;
  *          description: Request body validation failed
  *        401:
  *          description: Login failed
+ *
+ * /api/v1/auth/facebook:
+ *    get:
+ *      summary: Login using facebook - customer register only
+ *      tags:
+ *        - auth
  */
