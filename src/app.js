@@ -19,6 +19,7 @@ const orderRouter = require("./routers/order.router");
 const ManagerRouter = require("./routers/manager.router");
 const TableRouter = require("./routers/table.router");
 const PromotionRouter = require("./routers/promotion.router");
+const trendingRouter = require("./routers/trending.router");
 
 const socketServer = require('./configs/socketConfig');
 
@@ -65,6 +66,7 @@ app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/managers", ManagerRouter);
 app.use("/api/v1/tables", TableRouter);
 app.use("/api/v1/promotions", PromotionRouter);
+app.use("/api/v1/trending", trendingRouter);
 
 // Route not found handler
 app.use(RouteNotFoundHandler);
