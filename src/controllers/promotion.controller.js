@@ -27,6 +27,7 @@ const postPromotionHandler = () => {
         description: req.body.description,
         isDelivery: req.body.isDelivery,
         discount: req.body.discount,
+        count: 0,
       };
       const promotionItems = req.body.promotionItems ? req.body.promotionItems : [];
 

@@ -5,6 +5,7 @@ exports.up = function (knex) {
     table.increments("id").primary();
     table.string("description").notNullable();
     table.boolean("is_delivery").notNullable();
+    table.integer("count").notNullable().unsigned();
     table.decimal("discount").notNullable();
     // table.date("expiry_date");
 

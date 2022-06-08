@@ -1,15 +1,15 @@
 const router = require("express").Router();
 const orderController = require("../controllers/order.controller");
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
-const roles = require('../models/roles');
+const roles = require("../models/roles");
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { postOrder, patchOrder } = require("../validation/order.schema");
 
-router.get('/', AuthorizationMiddleware([roles.OWNER, roles.MANAGER, roles.CUSTOMER]), orderController.get_all_orders);
+router.get("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER, roles.CUSTOMER]), orderController.get_all_orders);
 
-router.post('/', AuthorizationMiddleware([roles.CUSTOMER]), ValidationMiddleware(postOrder), orderController.create_order);
+router.post("/", AuthorizationMiddleware([roles.CUSTOMER]), ValidationMiddleware(postOrder), orderController.create_order);
 
-router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchOrder), orderController.update_order_status);
+router.patch("/status/:orderId", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchOrder), orderController.update_order_status);
 
 /**
  * @swagger
@@ -115,6 +115,8 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *            type: string
  *          totalPrice:
  *            type: string
+ *          promotionId:
+ *            type: integer
  *          location:
  *            $ref: '#/components/schemas/Location'
  *          foodItems:
