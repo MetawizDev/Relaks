@@ -39,16 +39,20 @@ exports.create_order = async (req, res, next) => {
     const order = await User.relatedQuery('orders').for(userId).insert({ isDelivery, noOfItems, totalPrice, latitude, longitude, status });
     // making a relation to the join table
     const orderId = order.id;
-    for (const { id: foodItemId, quantity, portionId } of foodItems) {
-      await OrderFooditemPortion.query().insert({ orderId, foodItemId, portionId, quantity });
+    for (const { id: foodItemId, quantity, portionId, note } of foodItems) {
+      await OrderFooditemPortion.query().insert({ orderId, foodItemId, portionId, quantity, note });
     }
+    const fooditems = await OrderFooditemPortion.query()
+        .select('foodItemId', 'portionId', 'quantity', 'note')
+        .where('order_id', orderId)
+      const result = { ...order, foodItems: [...fooditems] }
     res.status(201).json({
       message: "Order created successfully",
       success: true,
-      data: order,
+      data: result,
     });
 
-    socketServer.emitToRoom(roles.MANAGER, 'new-order', { data: order });
+    socketServer.emitToRoom(roles.MANAGER, 'new-order', { data: result });
 
   } catch (error) {
     next(error);
@@ -82,7 +86,7 @@ exports.get_all_orders = async (req, res, next) => {
     let data = [];
     for (const order of orders) {
       const fooditems = await OrderFooditemPortion.query()
-        .select('foodItemId', 'portionId', 'quantity')
+        .select('foodItemId', 'portionId', 'quantity', 'note')
         .where('order_id', order.id)
       const result = { ...order, foodItems: [...fooditems] }
       data.push(result);
@@ -120,11 +124,9 @@ exports.update_order_status = async (req, res, next) => {
     if (isValidTransition) {
       Order.query()
         .patchAndFetchById(id, { status: newStatus })
-        .withGraphFetched('[foodItems]')
         .then((data) => {
           res.status(200).json({
-            message: "Order updated successfully",
-            data,
+            message: `Order ${id} changed from ${oldStatus} to ${newStatus}`
           });
           // notify the user
           const notification = `Your order has been ${newStatus}`;

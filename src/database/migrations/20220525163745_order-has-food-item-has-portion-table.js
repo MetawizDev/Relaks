@@ -5,6 +5,7 @@ exports.up = function (knex) {
     table.increments("id").primary();
     table.integer("food_item_id").unsigned().notNullable().references("id").inTable("food_item");
     table.integer("quantity").unsigned().notNullable();
+    table.string("note");
     table.integer("order_id").unsigned().notNullable().references("id").inTable("order");
     table.integer("portion_id").unsigned().notNullable().references("id").inTable("portion");
 

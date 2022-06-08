@@ -14,6 +14,7 @@ const Schema = {
         id: Joi.number(),
         quantity: Joi.number(),
         portionId: Joi.number(),
+        note: Joi.string(),
       })
       .required(),
   }),

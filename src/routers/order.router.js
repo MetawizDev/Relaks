@@ -21,6 +21,7 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *          - id
  *          - quantity
  *          - portionId
+ *          - note
  *        properties:
  *          id:
  *            type: integer
@@ -31,6 +32,8 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *          portionId:
  *            type: integer
  *            description: Id of the portion
+ *          note:
+ *            type: string
  *
  *      FoodItemRequest:
  *        type: object
@@ -38,6 +41,7 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *          - id
  *          - quantity
  *          - portionId
+ *          - note
  *        properties:
  *          id:
  *            type: integer
@@ -48,6 +52,9 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *          portionId:
  *            type: integer
  *            description: Id of the portion
+ *          note:
+ *            type: string
+ *            description: Extra items for the food
  *
  *      Order:
  *        type: object
@@ -110,9 +117,6 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *            type: string
  *          location:
  *            $ref: '#/components/schemas/Location'
- *          status:
- *            type: string
- *            description: pending, prepared, cancelled
  *          foodItems:
  *            type: array
  *            description: Array of foodItems in the order
@@ -229,9 +233,7 @@ router.patch('/status/:orderId', AuthorizationMiddleware([roles.OWNER, roles.MAN
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Order updated successfully
- *                 data:
- *                   $ref: '#/components/schemas/Order'
+ *                   example: Your order 3 changed from pending to accepted
  *
  *
  */
