@@ -9,6 +9,7 @@ const NotFoundException = require("../common/exceptions/NotFoundException");
 const orderStatus = require('../models/orderStatus');
 const roles = require('../models/roles');
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
+const socketServer = require('../configs/socketConfig');
 
 exports.create_order = async (req, res, next) => {
   const userId = req.user.id;
@@ -46,6 +47,8 @@ exports.create_order = async (req, res, next) => {
       success: true,
       data: order,
     });
+
+    socketServer.emitToRoom(roles.MANAGER, 'new-order', { data: order });
 
   } catch (error) {
     next(error);
@@ -100,8 +103,9 @@ exports.update_order_status = async (req, res, next) => {
   const newStatus = req.body.status;
 
   try {
-    const { status: oldStatus } = await Order.query()
+    const { status: oldStatus, user } = await Order.query()
       .findById(id)
+      .withGraphJoined('user') 
       .throwIfNotFound({ message: "Order does not exist" });
 
     let isValidTransition = false;
@@ -122,6 +126,9 @@ exports.update_order_status = async (req, res, next) => {
             message: "Order updated successfully",
             data,
           });
+          // notify the user
+          const notification = `Your order has been ${newStatus}`;
+          socketServer.emitToRoom(user.username, 'order-status', {data: notification})
         })
         .catch((error) => {
           next(error);
