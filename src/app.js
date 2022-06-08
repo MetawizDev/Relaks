@@ -20,7 +20,13 @@ const ManagerRouter = require("./routers/manager.router");
 const TableRouter = require("./routers/table.router");
 const PromotionRouter = require("./routers/promotion.router");
 
+const socketServer = require('./configs/socketConfig');
+
 const app = express();
+
+const httpServer = require('http').Server(app);
+
+socketServer.connect(httpServer);
 
 app.use(session({ secret: process.env.SESSION_KEY, resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
@@ -67,4 +73,8 @@ app.use(RouteNotFoundHandler);
 // Exception handler
 app.use(ExceptionHandler);
 
-module.exports = app;
+httpServer.listen(process.env.PORT, () => {
+  console.log(`[Server] Listening on port ${process.env.PORT}`);
+})
+
+module.exports = httpServer;
