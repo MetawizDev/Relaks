@@ -2,6 +2,7 @@ const { getTable, createTable, reserveTable, getAvailableTables, getReservedTabl
 const ConflictException = require("../common/exceptions/ConflictException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
+const socketServer = require('../configs/socketConfig');
 
 const getTablesHandler = () => {
   return async (req, res, next) => {
@@ -88,6 +89,9 @@ const reserveTableHandler = () => {
         success: true,
         data: table,
       });
+
+      socketServer.emitToRoom(roles.MANAGER, 'table-reserve', { data: table });
+
     } catch (error) {
       next(error);
     }

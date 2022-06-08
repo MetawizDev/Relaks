@@ -49,9 +49,9 @@ exports.connect = (server) => {
   }
 }
 
-exports.emit = (event, data) => {
+exports.emitToAll = (event, data) => {
   if(io) {
-    io.sockets.emit(event, data);
+    io.emit(event, data);
     console.log('[SENT TO ALL] ', event.toString());
   } else {
     console.log('io not initialized');
