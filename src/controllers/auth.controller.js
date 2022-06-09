@@ -7,6 +7,8 @@ const UnauthorizedException = require("../common/exceptions/UnauthorizedExceptio
 
 const { getUser, createUser, comparePassword, updateUser } = require("../services/auth.service");
 
+const mailConfig = require('../configs/mailConfig');
+
 const userRegisterHandler = (role) => {
   return async (req, res, next) => {
     try {
@@ -24,6 +26,9 @@ const userRegisterHandler = (role) => {
         success: true,
         data: user,
       });
+
+      const body = `Welcome to Relaks. Your account has been created.`
+      await mailConfig.sendMail('Hello from Relaks team!', body, req.body.email);
     } catch (error) {
       next(error);
     }
