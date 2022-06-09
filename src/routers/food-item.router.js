@@ -1,6 +1,6 @@
 const express = require("express");
 
-const { getFoodItemsHandler, createFoodItemHandler, patchFoodItemHandler, deleteFoodItemsHandler, checkFoodItemHandler, patchFoodItemImageHandler } = require("../controllers/food-item.controller");
+const { getFoodItemsHandler, createFoodItemHandler, patchFoodItemHandler, deleteFoodItemsHandler, checkFoodItemHandler, patchFoodItemImageHandler, getFoodItemHandler } = require("../controllers/food-item.controller");
 
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 
@@ -13,6 +13,7 @@ const FoodItemRouter = express.Router();
 
 FoodItemRouter.get("/", getFoodItemsHandler());
 FoodItemRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postFoodItem), createFoodItemHandler());
+FoodItemRouter.get("/:id", getFoodItemHandler());
 FoodItemRouter.patch("/:id/image", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), checkFoodItemHandler(), fileUploadMiddleware("food-item", 1), patchFoodItemImageHandler());
 FoodItemRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchFoodItem), patchFoodItemHandler());
 FoodItemRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), deleteFoodItemsHandler());
@@ -91,6 +92,23 @@ module.exports = FoodItemRouter;
  *                  description: Authentication failed
  *
  * /api/v1/food-items/{id}:
+ *      get:
+ *          summary: Get a single food item - public
+ *          tags:
+ *              - Food Items
+ *          parameters:
+ *              -   in : path
+ *                  name : id
+ *                  required: true
+ *                  description: food item id
+ *                  schema:
+ *                      type: integer
+ *          responses:
+ *              200:
+ *                  description: Food item object
+ *              404:
+ *                  description: Food item not found
+ *
  *      patch:
  *          summary: Update a food item - owner, manager
  *          tags:

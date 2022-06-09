@@ -3,7 +3,7 @@ const NotFoundException = require("../common/exceptions/NotFoundException");
 const deleteImageHandler = require("../common/handlers/deleteImage.handler");
 
 const { getCategory } = require("../services/category.service");
-const { getAllFoodItems, createFoodItem, getFoodItem, getFoodItemsByCategory, patchFoodItem, deleteFoodItem, updateFoodItemImage } = require("../services/food-item.services");
+const { getAllFoodItems, createFoodItem, getFoodItem, getFoodItemsByCategory, patchFoodItem, deleteFoodItem, updateFoodItemImage, getFoodItemWithPortions } = require("../services/food-item.services");
 const { getPortion } = require("../services/portion.service");
 
 const getFoodItemsHandler = () => {
@@ -165,6 +165,24 @@ const patchFoodItemImageHandler = () => {
   };
 };
 
+const getFoodItemHandler = () => {
+  return async (req, res, next) => {
+    try {
+      // Check for valid fooditem
+      const foodItem = await getFoodItemWithPortions(req.params.id);
+      if (!foodItem) throw new NotFoundException("Food item does not exist!");
+
+      res.status(200).json({
+        message: "Food Item fetched succesfully",
+        success: true,
+        data: foodItem,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 module.exports = {
   getFoodItemsHandler,
   createFoodItemHandler,
@@ -172,4 +190,5 @@ module.exports = {
   deleteFoodItemsHandler,
   checkFoodItemHandler,
   patchFoodItemImageHandler,
+  getFoodItemHandler,
 };
