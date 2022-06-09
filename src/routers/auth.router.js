@@ -1,12 +1,19 @@
 const express = require("express");
-const { userRegisterHandler, userLoginHandler, facebookSuccessLoginHandler, userUpdateHandler } = require("../controllers/auth.controller");
+const { 
+  userRegisterHandler, 
+  userLoginHandler, 
+  facebookSuccessLoginHandler, 
+  userUpdateHandler, 
+  requestPasswordReset, 
+  passwordReset 
+} = require("../controllers/auth.controller");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
 const userController = require("../controllers/user.controller");
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
-const { registerUser, loginUser } = require("../validation/user.schema");
+const { registerUser, loginUser, resetPasswordSchema } = require("../validation/user.schema");
 const roles = require("../models/roles");
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 
@@ -15,6 +22,10 @@ const AuthRouter = express.Router();
 // Register Routers
 AuthRouter.post("/manager/register", ValidationMiddleware(registerUser), userRegisterHandler(roles.MANAGER));
 AuthRouter.post("/customer/register", ValidationMiddleware(registerUser), userRegisterHandler(roles.CUSTOMER));
+
+// password reset
+AuthRouter.get("/password-reset", requestPasswordReset);
+AuthRouter.post("/password-reset", ValidationMiddleware(resetPasswordSchema), passwordReset);
 
 // Login routers
 AuthRouter.post("/login", ValidationMiddleware(loginUser), userLoginHandler());

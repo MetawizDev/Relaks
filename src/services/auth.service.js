@@ -19,9 +19,16 @@ const comparePassword = async (password, hash) => {
   return await bcrypt.compare(password, hash);
 };
 
+const saveResetToken = async (token, username) => {
+  const salt = await bcrypt.genSalt();
+  const hashedToken = await bcrypt.hash(token, salt);
+  return await User.query().patch({ resetToken: hashedToken }).where('username', '=', username);
+}
+
 module.exports = {
   getUser,
   createUser,
   comparePassword,
   updateUser,
+  saveResetToken,
 };
