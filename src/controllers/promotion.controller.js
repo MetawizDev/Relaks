@@ -3,6 +3,7 @@ const { createPromotion, getAllPromotions, deletePromotion, getPromotion, update
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
 const { getPortion } = require("../services/portion.service");
+const deleteImageHandler = require("../common/handlers/deleteImage.handler");
 
 const getAllPromotionsHandler = () => {
   return async (req, res, next) => {
@@ -58,8 +59,13 @@ const deletePromotionHandler = () => {
 
       if (isNaN(promotionId) | (promotionId <= 0)) throw new NotAcceptableException("Promotion id must be a positive integer!");
 
-      if (!(await getPromotion(promotionId))) throw new NotFoundException("Promotion not found!");
+      const promotion = await getPromotion(promotionId);
 
+      if (!promotion) throw new NotFoundException("Promotion not found!");
+
+      if (promotion.imgUrl) {
+        deleteImageHandler(promotion.imgUrl);
+      }
       await deletePromotion(promotionId);
 
       res.status(200).json({

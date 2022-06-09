@@ -1,5 +1,6 @@
 const ConflictException = require("../common/exceptions/ConflictException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
+const deleteImageHandler = require("../common/handlers/deleteImage.handler");
 
 const { getCategory } = require("../services/category.service");
 const { getAllFoodItems, createFoodItem, getFoodItem, getFoodItemsByCategory, patchFoodItem, deleteFoodItem, updateFoodItemImage } = require("../services/food-item.services");
@@ -109,9 +110,13 @@ const deleteFoodItemsHandler = () => {
   return async (req, res, next) => {
     try {
       // Check for valid fooditem
-      if (!(await getFoodItem("id", req.params.id))) throw new NotFoundException("Food item does not exist!");
+      const foodItem = await getFoodItem("id", req.params.id);
+      if (!foodItem) throw new NotFoundException("Food item does not exist!");
 
       //Delete Food Item
+      if (foodItem.imgUrl) {
+        deleteImageHandler(foodItem.imgUrl);
+      }
       await deleteFoodItem(req.params.id);
 
       res.status(200).json({

@@ -1,7 +1,6 @@
 const multer = require("multer");
 const path = require("path");
 const ValidationException = require("../common/exceptions/ValidationException");
-const fs = require("fs");
 
 const fileUploadMiddleware = (subfolder, files) => {
   const folderName = `./public/assets/${subfolder}`;

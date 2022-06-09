@@ -3,6 +3,7 @@ const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
 const { getAllCategories, createCategory, patchCategory, deleteCategory, getCategory, getFoodItemsOfCategory, getSomeCategories, updateCategoryImage } = require("../services/category.service");
 const ValidationException = require("../common/exceptions/ValidationException");
+const deleteImageHandler = require("../common/handlers/deleteImage.handler");
 
 const getAllCategoriesHandler = () => {
   return async (req, res, next) => {
@@ -84,6 +85,10 @@ const deleteCategoryHandler = () => {
       if (foodItems.length) throw new ConflictException("Cannot delete category with existing foot items!");
 
       // Delete category
+      if (category[0].imgUrl) {
+        deleteImageHandler(category[0].imgUrl);
+      }
+
       await deleteCategory(req.params.id);
 
       res.status(200).json({
