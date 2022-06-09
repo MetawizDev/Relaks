@@ -50,7 +50,7 @@ initDatabase(knexConnection);
  *         description: Returns welcome message.
  */
 
-app.use(express.static("public"));
+app.use("/static", express.static("public"));
 
 app.get("/", (req, res, next) => {
   res.json({
