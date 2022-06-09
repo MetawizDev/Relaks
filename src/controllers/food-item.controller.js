@@ -2,7 +2,7 @@ const ConflictException = require("../common/exceptions/ConflictException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 
 const { getCategory } = require("../services/category.service");
-const { getAllFoodItems, createFoodItem, getFoodItem, getFoodItemsByCategory, patchFoodItem, deleteFoodItem } = require("../services/food-item.services");
+const { getAllFoodItems, createFoodItem, getFoodItem, getFoodItemsByCategory, patchFoodItem, deleteFoodItem, updateFoodItemImage } = require("../services/food-item.services");
 const { getPortion } = require("../services/portion.service");
 
 const getFoodItemsHandler = () => {
@@ -124,9 +124,47 @@ const deleteFoodItemsHandler = () => {
   };
 };
 
+const checkFoodItemHandler = () => {
+  return async (req, res, next) => {
+    try {
+      // Check for valid category
+      const foodItem = await getFoodItem("id", req.params.id);
+      if (!foodItem) throw new NotFoundException("Food Item does not exist!");
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+const patchFoodItemImageHandler = () => {
+  return async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const imgUrl = req.body.imgUrl;
+
+      if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
+
+      // Update category image
+      const foodItem = await updateFoodItemImage(id, imgUrl);
+
+      res.status(200).json({
+        message: "Food item image updated successful!",
+        success: true,
+        data: foodItem,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 module.exports = {
   getFoodItemsHandler,
   createFoodItemHandler,
   patchFoodItemHandler,
   deleteFoodItemsHandler,
+  checkFoodItemHandler,
+  patchFoodItemImageHandler,
 };

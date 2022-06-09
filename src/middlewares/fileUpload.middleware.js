@@ -14,7 +14,7 @@ const fileUploadMiddleware = (subfolder, files) => {
       const fileExt = path.parse(file.originalname).ext;
       const imageName = req.params.id;
       imgName = `${imageName}${fileExt}`;
-      req.body.imgUrl = `/assets/${subfolder}/${imgName}`;
+      req.body.imgUrl = `/static/assets/${subfolder}/${imgName}`;
       cb(null, imgName);
     },
   });

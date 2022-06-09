@@ -48,6 +48,10 @@ const deleteFoodItem = async (id) => {
   return;
 };
 
+const updateFoodItemImage = async (id, imgUrl) => {
+  return await FoodItem.query().patchAndFetchById(id, { imgUrl });
+};
+
 module.exports = {
   getAllFoodItems,
   getFoodItem,
@@ -55,4 +59,5 @@ module.exports = {
   getFoodItemsByCategory,
   patchFoodItem,
   deleteFoodItem,
+  updateFoodItemImage,
 };
