@@ -127,7 +127,7 @@ const deleteFoodItemsHandler = () => {
 const checkFoodItemHandler = () => {
   return async (req, res, next) => {
     try {
-      // Check for valid category
+      // Check for valid fooditem
       const foodItem = await getFoodItem("id", req.params.id);
       if (!foodItem) throw new NotFoundException("Food Item does not exist!");
 
@@ -146,7 +146,7 @@ const patchFoodItemImageHandler = () => {
 
       if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
 
-      // Update category image
+      // Update fooditem image
       const foodItem = await updateFoodItemImage(id, imgUrl);
 
       res.status(200).json({

@@ -1,5 +1,5 @@
 const { getFoodItem } = require("../services/food-item.services");
-const { createPromotion, getAllPromotions, deletePromotion, getPromotion, updatePromotion } = require("../services/promotion.service");
+const { createPromotion, getAllPromotions, deletePromotion, getPromotion, updatePromotion, updatePromotionImage } = require("../services/promotion.service");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
 const { getPortion } = require("../services/portion.service");
@@ -109,9 +109,47 @@ const updatePromotionHandler = () => {
   };
 };
 
+const checkPromotionHandler = () => {
+  return async (req, res, next) => {
+    try {
+      // Check for valid promotion
+      const promotion = await getPromotion(req.params.id);
+      if (!promotion) throw new NotFoundException("Promotion does not exist!");
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+const patchPromotionImageHandler = () => {
+  return async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const imgUrl = req.body.imgUrl;
+
+      if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
+
+      // Update promotion image
+      const promotion = await updatePromotionImage(id, imgUrl);
+
+      res.status(200).json({
+        message: "Promotion image updated successful!",
+        success: true,
+        data: promotion,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 module.exports = {
   getAllPromotionsHandler,
   postPromotionHandler,
   deletePromotionHandler,
   updatePromotionHandler,
+  checkPromotionHandler,
+  patchPromotionImageHandler,
 };
