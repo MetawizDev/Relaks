@@ -1,7 +1,9 @@
 const ConflictException = require("../common/exceptions/ConflictException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
-const { getAllCategories, createCategory, patchCategory, deleteCategory, getCategory, getFoodItemsOfCategory, getSomeCategories } = require("../services/category.service");
+const { getAllCategories, createCategory, patchCategory, deleteCategory, getCategory, getFoodItemsOfCategory, getSomeCategories, updateCategoryImage } = require("../services/category.service");
+const ValidationException = require("../common/exceptions/ValidationException");
+const deleteImageHandler = require("../common/handlers/deleteImage.handler");
 
 const getAllCategoriesHandler = () => {
   return async (req, res, next) => {
@@ -83,6 +85,10 @@ const deleteCategoryHandler = () => {
       if (foodItems.length) throw new ConflictException("Cannot delete category with existing foot items!");
 
       // Delete category
+      if (category[0].imgUrl) {
+        deleteImageHandler(category[0].imgUrl);
+      }
+
       await deleteCategory(req.params.id);
 
       res.status(200).json({
@@ -95,9 +101,47 @@ const deleteCategoryHandler = () => {
   };
 };
 
+const checkCatergoryHandler = () => {
+  return async (req, res, next) => {
+    try {
+      // Check for valid category
+      const category = await getCategory("id", req.params.id);
+      if (!category.length) throw new NotFoundException("Category does not exist!");
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+const patchCategoryImageHandler = () => {
+  return async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const imgUrl = req.body.imgUrl;
+
+      if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
+
+      // Update category image
+      const category = await updateCategoryImage(id, imgUrl);
+
+      res.status(200).json({
+        message: "Category image updated successful!",
+        success: true,
+        data: category,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 module.exports = {
   getAllCategoriesHandler,
   postCategoryHandler,
   patchCategoryHandler,
   deleteCategoryHandler,
+  checkCatergoryHandler,
+  patchCategoryImageHandler,
 };

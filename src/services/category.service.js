@@ -30,6 +30,10 @@ const getFoodItemsOfCategory = async (id) => {
   return await Category.relatedQuery("foodItems").for(id);
 };
 
+const updateCategoryImage = async (id, imgUrl) => {
+  return await Category.query().patchAndFetchById(id, { imgUrl });
+};
+
 module.exports = {
   getAllCategories,
   createCategory,
@@ -38,4 +42,5 @@ module.exports = {
   deleteCategory,
   getFoodItemsOfCategory,
   getSomeCategories,
+  updateCategoryImage,
 };

@@ -1,17 +1,20 @@
 const express = require("express");
 
-const { getFoodItemsHandler, createFoodItemHandler, patchFoodItemHandler, deleteFoodItemsHandler } = require("../controllers/food-item.controller");
+const { getFoodItemsHandler, createFoodItemHandler, patchFoodItemHandler, deleteFoodItemsHandler, checkFoodItemHandler, patchFoodItemImageHandler, getFoodItemHandler } = require("../controllers/food-item.controller");
 
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { postFoodItem, patchFoodItem } = require("../validation/food-item.schema");
 const roles = require("../models/roles");
+const fileUploadMiddleware = require("../middlewares/fileUpload.middleware");
 
 const FoodItemRouter = express.Router();
 
 FoodItemRouter.get("/", getFoodItemsHandler());
 FoodItemRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postFoodItem), createFoodItemHandler());
+FoodItemRouter.get("/:id", getFoodItemHandler());
+FoodItemRouter.patch("/:id/image", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), checkFoodItemHandler(), fileUploadMiddleware("food-item", 1), patchFoodItemImageHandler());
 FoodItemRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchFoodItem), patchFoodItemHandler());
 FoodItemRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), deleteFoodItemsHandler());
 
@@ -89,6 +92,23 @@ module.exports = FoodItemRouter;
  *                  description: Authentication failed
  *
  * /api/v1/food-items/{id}:
+ *      get:
+ *          summary: Get a single food item - public
+ *          tags:
+ *              - Food Items
+ *          parameters:
+ *              -   in : path
+ *                  name : id
+ *                  required: true
+ *                  description: food item id
+ *                  schema:
+ *                      type: integer
+ *          responses:
+ *              200:
+ *                  description: Food item object
+ *              404:
+ *                  description: Food item not found
+ *
  *      patch:
  *          summary: Update a food item - owner, manager
  *          tags:
@@ -137,6 +157,39 @@ module.exports = FoodItemRouter;
  *                  description: Deleted category object
  *              404:
  *                  description: CatFood item not found
+ *              403:
+ *                  description: No access rights
+ *              401:
+ *                  description: Authentication failed
+ *
+ * /api/v1/food-items/{id}/image:
+ *      patch:
+ *          summary: Add/Update a food item image - owner, manager
+ *          tags:
+ *              -   Food Items
+ *          parameters:
+ *              -   in : path
+ *                  name : id
+ *                  required: true
+ *                  description: food item id
+ *                  schema:
+ *                      type: integer
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  multipart/form-data:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              file:
+ *                                  type: file
+ *          responses:
+ *              200:
+ *                  description: Image updated
+ *              404:
+ *                  description: Food item not found
+ *              400:
+ *                  description: Request body validation failed
  *              403:
  *                  description: No access rights
  *              401:

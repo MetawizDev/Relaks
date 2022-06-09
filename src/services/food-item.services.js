@@ -10,6 +10,10 @@ const getFoodItem = async (key, value) => {
   return await FoodItem.query().where(key, "=", value).first();
 };
 
+const getFoodItemWithPortions = async (id) => {
+  return await FoodItem.query().findById(id).withGraphFetched("portions");
+};
+
 const createFoodItem = async ({ name, category, portions }) => {
   let foodItem = await Category.relatedQuery("foodItems").for(category).insert({ name });
 
@@ -48,6 +52,10 @@ const deleteFoodItem = async (id) => {
   return;
 };
 
+const updateFoodItemImage = async (id, imgUrl) => {
+  return await FoodItem.query().patchAndFetchById(id, { imgUrl });
+};
+
 module.exports = {
   getAllFoodItems,
   getFoodItem,
@@ -55,4 +63,6 @@ module.exports = {
   getFoodItemsByCategory,
   patchFoodItem,
   deleteFoodItem,
+  updateFoodItemImage,
+  getFoodItemWithPortions,
 };

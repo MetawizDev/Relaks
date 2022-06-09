@@ -10,6 +10,8 @@ const NotAcceptableException = require("../common/exceptions/NotAcceptableExcept
 const authService = require("../services/auth.service");
 const mailConfig = require('../configs/mailConfig');
 
+const roles = require("../models/roles");
+
 const userRegisterHandler = (role) => {
   return async (req, res, next) => {
     try {
@@ -19,6 +21,7 @@ const userRegisterHandler = (role) => {
 
       // Create user
       req.body.role = role;
+      if (role === roles.MANAGER) req.body.isActive = true;
       req.body.username = req.body.email;
       let user = await authService.createUser(req.body);
 
@@ -44,6 +47,8 @@ const userLoginHandler = () => {
 
       // Check if the user exists
       if (!user) throw new UnauthorizedException("Invalid email or password!");
+
+      if ((user.role === roles.MANAGER) & !user.isActive) throw new UnauthorizedException("Account inactive! Please contact owner!");
 
       // Check if the password match
       if (!(await authService.comparePassword(req.body.password, user.password))) throw new UnauthorizedException("Invalid email or password!");

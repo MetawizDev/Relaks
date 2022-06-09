@@ -5,6 +5,7 @@ const Schema = {
     isDelivery: Joi.boolean().required(),
     noOfItems: Joi.number().required(),
     totalPrice: Joi.number().required(),
+    promotionId: Joi.number(),
     location: Joi.object({
       latitude: Joi.number().required(),
       longitude: Joi.number().required(),

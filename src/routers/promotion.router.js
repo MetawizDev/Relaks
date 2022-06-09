@@ -1,15 +1,17 @@
 const express = require("express");
-const { postPromotionHandler, getAllPromotionsHandler, deletePromotionHandler, updatePromotionHandler } = require("../controllers/promotion.controller");
+const { postPromotionHandler, getAllPromotionsHandler, deletePromotionHandler, updatePromotionHandler, checkPromotionHandler, patchPromotionImageHandler } = require("../controllers/promotion.controller");
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { postPromotion, patchPromotion } = require("../validation/promotion.schema");
+const fileUploadMiddleware = require("../middlewares/fileUpload.middleware");
 const roles = require("../models/roles");
 
 const PromotionRouter = express.Router();
 
 PromotionRouter.get("/", getAllPromotionsHandler());
 PromotionRouter.post("/", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), ValidationMiddleware(postPromotion), postPromotionHandler());
-PromotionRouter.patch("/:id", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), ValidationMiddleware(patchPromotion), updatePromotionHandler());
+PromotionRouter.patch("/:id/image", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), checkPromotionHandler(), fileUploadMiddleware("promotion", 1), patchPromotionImageHandler());
+// PromotionRouter.patch("/:id", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), ValidationMiddleware(patchPromotion), updatePromotionHandler());
 PromotionRouter.delete("/:id", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), deletePromotionHandler());
 
 module.exports = PromotionRouter;
@@ -30,6 +32,9 @@ module.exports = PromotionRouter;
  *              discount:
  *                  type: number
  *                  description: discount percentage
+ *              totalPrice:
+ *                  type: number
+ *                  description: total price before discount
  *              promotionItems:
  *                  type: array
  *                  items:
@@ -77,38 +82,6 @@ module.exports = PromotionRouter;
  *                  description: Authentication failed
  *
  * /api/v1/promotions/{id}:
- *      patch:
- *          summary: Update promotion - owner, manager
- *          tags:
- *              -   Promotions
- *          parameters:
- *              -   in : path
- *                  name : id
- *                  required: true
- *                  description: promotion id
- *                  schema:
- *                      type: integer
- *          requestBody:
- *              required: true
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/schemas/Promotion'
- *          responses:
- *              200:
- *                  description: Promotion updated
- *              406:
- *                  description: Invalid query parameter
- *              404:
- *                  description: Promotion, fooditem, portion not found
- *              400:
- *                  description: Request body validation failed
- *              403:
- *                  description: No access rights
- *              401:
- *                  description: Authentication failed
- *
- *
  *      delete:
  *          summary: Delete a promotion - owner, manager
  *          tags:
@@ -131,4 +104,68 @@ module.exports = PromotionRouter;
  *                  description: No access rights
  *              401:
  *                  description: Authentication failed
+ *
+ * /api/v1/promotions/{id}/image:
+ *      patch:
+ *          summary: Add/Update a promotion image - owner, manager
+ *          tags:
+ *              -   Promotions
+ *          parameters:
+ *              -   in : path
+ *                  name : id
+ *                  required: true
+ *                  description: promotion id
+ *                  schema:
+ *                      type: integer
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  multipart/form-data:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              file:
+ *                                  type: file
+ *          responses:
+ *              200:
+ *                  description: Image updated
+ *              404:
+ *                  description: Promotion not found
+ *              400:
+ *                  description: Request body validation failed
+ *              403:
+ *                  description: No access rights
+ *              401:
+ *                  description: Authentication failed
  */
+
+//  *      patch:
+//  *          summary: Update promotion - owner, manager
+//  *          tags:
+//  *              -   Promotions
+//  *          parameters:
+//  *              -   in : path
+//  *                  name : id
+//  *                  required: true
+//  *                  description: promotion id
+//  *                  schema:
+//  *                      type: integer
+//  *          requestBody:
+//  *              required: true
+//  *              content:
+//  *                  application/json:
+//  *                      schema:
+//  *                          $ref: '#/components/schemas/Promotion'
+//  *          responses:
+//  *              200:
+//  *                  description: Promotion updated
+//  *              406:
+//  *                  description: Invalid query parameter
+//  *              404:
+//  *                  description: Promotion, fooditem, portion not found
+//  *              400:
+//  *                  description: Request body validation failed
+//  *              403:
+//  *                  description: No access rights
+//  *              401:
+//  *                  description: Authentication failed

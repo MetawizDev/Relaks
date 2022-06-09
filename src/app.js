@@ -21,11 +21,11 @@ const TableRouter = require("./routers/table.router");
 const PromotionRouter = require("./routers/promotion.router");
 const trendingRouter = require("./routers/trending.router");
 
-const socketServer = require('./configs/socketConfig');
+const socketServer = require("./configs/socketConfig");
 
 const app = express();
 
-const httpServer = require('http').Server(app);
+const httpServer = require("http").Server(app);
 
 socketServer.connect(httpServer);
 
@@ -49,6 +49,9 @@ initDatabase(knexConnection);
  *       200:
  *         description: Returns welcome message.
  */
+
+app.use("/static", express.static("public"));
+
 app.get("/", (req, res, next) => {
   res.json({
     message: "Welcome to cafe-app-api v1.",
@@ -77,6 +80,6 @@ app.use(ExceptionHandler);
 
 httpServer.listen(process.env.PORT, () => {
   console.log(`[Server] Listening on port ${process.env.PORT}`);
-})
+});
 
 module.exports = httpServer;

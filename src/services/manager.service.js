@@ -9,7 +9,12 @@ const deleteManager = async (id) => {
   return await User.query().deleteById(id);
 };
 
+const changeManagerStatus = async (id, isActive) => {
+  return await User.query().findById(id).patch({ isActive });
+};
+
 module.exports = {
   getAllManagers,
   deleteManager,
+  changeManagerStatus,
 };

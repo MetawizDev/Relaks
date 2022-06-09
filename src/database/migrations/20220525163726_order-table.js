@@ -6,6 +6,7 @@ exports.up = function (knex) {
     table.boolean("is_delivery").notNullable();
     table.integer("no_of_items").notNullable();
     table.decimal("total_price").notNullable();
+    table.integer("promotion_id");
     table.string("status").notNullable();
     table.decimal("latitude").notNullable();
     table.decimal("longitude").notNullable();

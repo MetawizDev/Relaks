@@ -1,8 +1,9 @@
 const ConflictException = require("../common/exceptions/ConflictException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
+const deleteImageHandler = require("../common/handlers/deleteImage.handler");
 
 const { getCategory } = require("../services/category.service");
-const { getAllFoodItems, createFoodItem, getFoodItem, getFoodItemsByCategory, patchFoodItem, deleteFoodItem } = require("../services/food-item.services");
+const { getAllFoodItems, createFoodItem, getFoodItem, getFoodItemsByCategory, patchFoodItem, deleteFoodItem, updateFoodItemImage, getFoodItemWithPortions } = require("../services/food-item.services");
 const { getPortion } = require("../services/portion.service");
 
 const getFoodItemsHandler = () => {
@@ -109,9 +110,13 @@ const deleteFoodItemsHandler = () => {
   return async (req, res, next) => {
     try {
       // Check for valid fooditem
-      if (!(await getFoodItem("id", req.params.id))) throw new NotFoundException("Food item does not exist!");
+      const foodItem = await getFoodItem("id", req.params.id);
+      if (!foodItem) throw new NotFoundException("Food item does not exist!");
 
       //Delete Food Item
+      if (foodItem.imgUrl) {
+        deleteImageHandler(foodItem.imgUrl);
+      }
       await deleteFoodItem(req.params.id);
 
       res.status(200).json({
@@ -124,9 +129,66 @@ const deleteFoodItemsHandler = () => {
   };
 };
 
+const checkFoodItemHandler = () => {
+  return async (req, res, next) => {
+    try {
+      // Check for valid fooditem
+      const foodItem = await getFoodItem("id", req.params.id);
+      if (!foodItem) throw new NotFoundException("Food Item does not exist!");
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+const patchFoodItemImageHandler = () => {
+  return async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const imgUrl = req.body.imgUrl;
+
+      if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
+
+      // Update fooditem image
+      const foodItem = await updateFoodItemImage(id, imgUrl);
+
+      res.status(200).json({
+        message: "Food item image updated successful!",
+        success: true,
+        data: foodItem,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+const getFoodItemHandler = () => {
+  return async (req, res, next) => {
+    try {
+      // Check for valid fooditem
+      const foodItem = await getFoodItemWithPortions(req.params.id);
+      if (!foodItem) throw new NotFoundException("Food item does not exist!");
+
+      res.status(200).json({
+        message: "Food Item fetched succesfully",
+        success: true,
+        data: foodItem,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 module.exports = {
   getFoodItemsHandler,
   createFoodItemHandler,
   patchFoodItemHandler,
   deleteFoodItemsHandler,
+  checkFoodItemHandler,
+  patchFoodItemImageHandler,
+  getFoodItemHandler,
 };

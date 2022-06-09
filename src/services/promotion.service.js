@@ -2,14 +2,13 @@ const Promotion = require("../models/promotion.model");
 const PromotionFooditemPortion = require("../models/promotion-fooditem-portion.model");
 
 const getAllPromotions = async () => {
+  // Get all promotions
   const promotions = await Promotion.query();
-  for (let promotion of promotions) {
-    const promotionItems = await PromotionFooditemPortion.query().where("promotionId", "=", promotion.id);
-    promotion.promotionItems = [];
 
-    promotionItems.forEach((item) => {
-      promotion.promotionItems = [...promotion.promotionItems, { foodItemId: item.foodItemId, portionId: item.portionId, quantity: item.quantity, id: item.id }];
-    });
+  // For each promotion get promotion items
+  for (let promotion of promotions) {
+    promotion.promotionItems = [];
+    promotion.promotionItems.push(await PromotionFooditemPortion.query().select("id", "foodItemId", "portionId", "quantity").where("promotionId", "=", promotion.id));
   }
 
   return promotions;
@@ -19,20 +18,19 @@ const createPromotion = async (promotionDetails, promotionItems) => {
   // Insert promotion
   let promotion = await Promotion.query().insert(promotionDetails);
 
-  let insertedPromotionItems = [];
+  promotion.promotionItems = [];
 
   // Insert food items and portion in promotion
   for (const { foodItemId, portionId, quantity } of promotionItems) {
-    const promotionItem = await PromotionFooditemPortion.query().insert({
-      promotionId: promotion.id,
-      foodItemId,
-      portionId,
-      quantity,
-    });
-    insertedPromotionItems.push(promotionItem);
+    promotion.promotionItems.push(
+      await PromotionFooditemPortion.query().insert({
+        promotionId: promotion.id,
+        foodItemId,
+        portionId,
+        quantity,
+      })
+    );
   }
-
-  promotion = { ...promotion, promotionItems: insertedPromotionItems };
 
   return promotion;
 };
@@ -47,18 +45,29 @@ const deletePromotion = async (id) => {
 };
 
 const updatePromotion = async (id, promotionDetails, promotionItems) => {
+  // Update promotion details
   let promotion = await Promotion.query().patchAndFetchById(id, promotionDetails);
 
-  promotion.promotionItems = [];
+  if (promotionItems.length) {
+    promotion.promotionItems = [];
 
-  await PromotionFooditemPortion.query().delete().where("promotion_id", id);
+    await PromotionFooditemPortion.query().delete().where("promotion_id", id);
 
-  for (const item of promotionItems) {
-    item.promotionId = id;
-    promotion.promotionItems.push(await PromotionFooditemPortion.query().insert(item));
+    for (const item of promotionItems) {
+      item.promotionId = id;
+      promotion.promotionItems.push(await PromotionFooditemPortion.query().insert(item));
+    }
   }
 
   return promotion;
+};
+
+const updatePromotionImage = async (id, imgUrl) => {
+  return await Promotion.query().patchAndFetchById(id, { imgUrl });
+};
+
+const incrimentPromotionCount = async (id) => {
+  await Promotion.query().findById(id).increment("count", 1);
 };
 
 module.exports = {
@@ -67,4 +76,6 @@ module.exports = {
   deletePromotion,
   getPromotion,
   updatePromotion,
+  incrimentPromotionCount,
+  updatePromotionImage,
 };

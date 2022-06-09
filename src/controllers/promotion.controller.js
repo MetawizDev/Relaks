@@ -1,8 +1,9 @@
 const { getFoodItem } = require("../services/food-item.services");
-const { createPromotion, getAllPromotions, deletePromotion, getPromotion, updatePromotion } = require("../services/promotion.service");
+const { createPromotion, getAllPromotions, deletePromotion, getPromotion, updatePromotion, updatePromotionImage } = require("../services/promotion.service");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
 const { getPortion } = require("../services/portion.service");
+const deleteImageHandler = require("../common/handlers/deleteImage.handler");
 
 const getAllPromotionsHandler = () => {
   return async (req, res, next) => {
@@ -27,6 +28,8 @@ const postPromotionHandler = () => {
         description: req.body.description,
         isDelivery: req.body.isDelivery,
         discount: req.body.discount,
+        totalPrice: req.body.totalPrice,
+        count: 0,
       };
       const promotionItems = req.body.promotionItems ? req.body.promotionItems : [];
 
@@ -57,8 +60,13 @@ const deletePromotionHandler = () => {
 
       if (isNaN(promotionId) | (promotionId <= 0)) throw new NotAcceptableException("Promotion id must be a positive integer!");
 
-      if (!(await getPromotion(promotionId))) throw new NotFoundException("Promotion not found!");
+      const promotion = await getPromotion(promotionId);
 
+      if (!promotion) throw new NotFoundException("Promotion not found!");
+
+      if (promotion.imgUrl) {
+        deleteImageHandler(promotion.imgUrl);
+      }
       await deletePromotion(promotionId);
 
       res.status(200).json({
@@ -108,9 +116,47 @@ const updatePromotionHandler = () => {
   };
 };
 
+const checkPromotionHandler = () => {
+  return async (req, res, next) => {
+    try {
+      // Check for valid promotion
+      const promotion = await getPromotion(req.params.id);
+      if (!promotion) throw new NotFoundException("Promotion does not exist!");
+
+      next();
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+const patchPromotionImageHandler = () => {
+  return async (req, res, next) => {
+    try {
+      const id = req.params.id;
+      const imgUrl = req.body.imgUrl;
+
+      if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
+
+      // Update promotion image
+      const promotion = await updatePromotionImage(id, imgUrl);
+
+      res.status(200).json({
+        message: "Promotion image updated successful!",
+        success: true,
+        data: promotion,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 module.exports = {
   getAllPromotionsHandler,
   postPromotionHandler,
   deletePromotionHandler,
   updatePromotionHandler,
+  checkPromotionHandler,
+  patchPromotionImageHandler,
 };
