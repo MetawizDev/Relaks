@@ -16,7 +16,7 @@ const Schema = {
   }),
   resetPasswordSchema: Joi.object({
     token: Joi.string().required(),
-    username: Joi.string().required(),
+    email: Joi.string().required(),
     password: Joi.string()
       .pattern(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,64})/)
       .required(),

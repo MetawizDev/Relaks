@@ -155,4 +155,35 @@ module.exports = AuthRouter;
  *      summary: Login using facebook - customer register only
  *      tags:
  *        - auth
+ * /api/v1/auth/password-reset:
+ *    get:
+ *      summary: Request for a password reset link
+ *      tags:
+ *        - auth
+ *      parameters:
+ *      - in: query
+ *        name: email
+ *        description: Email of the user
+ * 
+ *    post:
+ *      summary: Send the password reset data
+ *      tags:
+ *        - auth
+ *      parameters:
+ *        - in: body
+ *          type: object
+ *          required:
+ *            - token
+ *            - email
+ *            - password
+ *          properties:
+ *            token:
+ *              type: string
+ *              description: Password reset token sent via the email
+ *            email:
+ *              type: string
+ *              description: Email of the user
+ *            password:
+ *              type: string
+ *              description: New password for the user
  */

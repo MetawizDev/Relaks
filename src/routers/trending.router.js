@@ -1,7 +1,5 @@
 const router = require("express").Router();
 const trendingController = require("../controllers/trending.controller");
-const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
-const roles = require('../models/roles');
 
 router.get("/", trendingController.get_trendings);
 

@@ -103,7 +103,7 @@ const facebookSuccessLoginHandler = (req, res, next) => {
 };
 
 const requestPasswordReset = async (req, res, next) => {
-  const username = req.query.username;
+  const username = req.query.email;
   try {
     const user = await authService.getUser('username', username);
     if(!user) throw new NotFoundException(`User not found with username ${username}`);
@@ -131,7 +131,7 @@ const requestPasswordReset = async (req, res, next) => {
 }
 
 const passwordReset = async (req, res, next) => {
-  const { token, username, password } = req.body;
+  const { token, email: username, password } = req.body;
 
   try {
     const user = await authService.getUser('username', username);
