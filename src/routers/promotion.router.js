@@ -32,6 +32,9 @@ module.exports = PromotionRouter;
  *              discount:
  *                  type: number
  *                  description: discount percentage
+ *              totalPrice:
+ *                  type: number
+ *                  description: total price before discount
  *              promotionItems:
  *                  type: array
  *                  items:

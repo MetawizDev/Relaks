@@ -6,6 +6,7 @@ exports.up = function (knex) {
     table.string("description").notNullable();
     table.boolean("is_delivery").notNullable();
     table.integer("count").notNullable().unsigned();
+    table.decimal("total_price").notNullable();
     table.decimal("discount").notNullable();
     table.string("img_url").unique();
     // table.date("expiry_date");

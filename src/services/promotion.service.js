@@ -3,7 +3,7 @@ const PromotionFooditemPortion = require("../models/promotion-fooditem-portion.m
 
 const getAllPromotions = async () => {
   // Get all promotions
-  const promotions = await Promotion.query().select("id", "description", "isDelivery", "count", "imgUrl");
+  const promotions = await Promotion.query();
 
   // For each promotion get promotion items
   for (let promotion of promotions) {

@@ -5,6 +5,7 @@ const Schema = {
     description: Joi.string().required(),
     isDelivery: Joi.boolean().required(),
     discount: Joi.number().required(),
+    totalPrice: Joi.number().required(),
     promotionItems: Joi.array()
       .items({
         foodItemId: Joi.number().required(),
