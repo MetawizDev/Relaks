@@ -1,16 +1,18 @@
 const express = require("express");
-const { getAllCategoriesHandler, postCategoryHandler, patchCategoryHandler, deleteCategoryHandler } = require("../controllers/category.controller");
+const { getAllCategoriesHandler, postCategoryHandler, patchCategoryHandler, deleteCategoryHandler, checkCatergoryHandler, patchCategoryImageHandler } = require("../controllers/category.controller");
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const { postCategory, patchCategory } = require("../validation/category.schema");
 const roles = require("../models/roles");
+const fileUploadMiddleware = require("../middlewares/fileUpload.middleware");
 
 const CategoryRouter = express.Router();
 
 // Category Routers
 CategoryRouter.get("/", getAllCategoriesHandler());
 CategoryRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postCategory), postCategoryHandler());
+CategoryRouter.patch("/:id/image", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), checkCatergoryHandler(), fileUploadMiddleware("category", 1), patchCategoryImageHandler());
 CategoryRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchCategory), patchCategoryHandler());
 CategoryRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), deleteCategoryHandler());
 
@@ -120,6 +122,39 @@ module.exports = CategoryRouter;
  *                  description: Category not found
  *              409:
  *                  description: Cannot delete category with food items
+ *              403:
+ *                  description: No access rights
+ *              401:
+ *                  description: Authentication failed
+ *
+ * /api/v1/categories/{id}/image:
+ *      patch:
+ *          summary: Add/Update a category image - owner, manager
+ *          tags:
+ *              -   category
+ *          parameters:
+ *              -   in : path
+ *                  name : id
+ *                  required: true
+ *                  description: category id
+ *                  schema:
+ *                      type: integer
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  multipart/form-data:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              file:
+ *                                  type: file
+ *          responses:
+ *              200:
+ *                  description: Image updated
+ *              404:
+ *                  description: Category not found
+ *              400:
+ *                  description: Request body validation failed
  *              403:
  *                  description: No access rights
  *              401:
