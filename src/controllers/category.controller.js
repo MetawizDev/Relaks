@@ -4,6 +4,7 @@ const NotAcceptableException = require("../common/exceptions/NotAcceptableExcept
 const { getAllCategories, createCategory, patchCategory, deleteCategory, getCategory, getFoodItemsOfCategory, getSomeCategories, updateCategoryImage } = require("../services/category.service");
 const ValidationException = require("../common/exceptions/ValidationException");
 const deleteImageHandler = require("../common/handlers/deleteImage.handler");
+const { getFoodItem, getFoodItemsIdsByCategory } = require("../services/food-item.services");
 
 const getAllCategoriesHandler = () => {
   return async (req, res, next) => {
@@ -51,16 +52,37 @@ const postCategoryHandler = () => {
 const patchCategoryHandler = () => {
   return async (req, res, next) => {
     try {
-      // Check for valid category
-      let category = await getCategory("id", req.params.id);
-      if (!category.length) throw new NotFoundException("Category does not exist!");
+      const categoryId = req.params.id;
 
-      // Check for existing category with same name
-      category = await getCategory("name", req.body.name);
-      if (category.length) throw new ConflictException("Category already exist!");
+      // Check for valid category
+      let category = await getCategory("id", categoryId);
+      if (!category.length) {
+        throw new NotFoundException("Category does not exist!");
+      }
+
+      let data = {};
+
+      if (req.body.name) {
+        // Check for existing category with same name
+        category = await getCategory("name", req.body.name);
+        if (category.length) {
+          throw new ConflictException("Category already exist!");
+        }
+        data.name = req.body.name;
+      }
+
+      if (req.body.featuredItemId) {
+        let foodItemIds = await getFoodItemsIdsByCategory(categoryId);
+        foodItemIds = foodItemIds.map((item) => item.id);
+        if (!foodItemIds.includes(req.body.featuredItemId)) {
+          throw new NotFoundException("Featured food item does not exist or not in same category!");
+        }
+
+        data.featuredItemId = req.body.featuredItemId;
+      }
 
       // Patch category
-      category = await patchCategory(req.params.id, req.body);
+      category = await patchCategory(categoryId, data);
 
       res.status(200).json({
         message: "Category patched succefully",

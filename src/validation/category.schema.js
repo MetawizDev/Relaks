@@ -5,7 +5,8 @@ const Schema = {
     name: Joi.string().min(3).max(25).required(),
   }),
   patchCategory: Joi.object({
-    name: Joi.string().min(3).max(25).required(),
+    name: Joi.string().min(3).max(25),
+    featuredItemId: Joi.number(),
   }),
 };
 

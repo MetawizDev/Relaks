@@ -18,8 +18,7 @@ const getCategory = async (key, value) => {
 };
 
 const patchCategory = async (id, data) => {
-  const category = await Category.query().patchAndFetchById(id, data);
-  return category;
+  return await Category.query().patchAndFetchById(id, data).withGraphFetched("featuredItem");
 };
 
 const deleteCategory = async (id) => {

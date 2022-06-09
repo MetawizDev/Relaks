@@ -35,6 +35,10 @@ const getFoodItemsByCategory = async (categoryId) => {
   return await FoodItem.query().where("food_item.category_id", "=", categoryId).withGraphFetched("[category,portions]");
 };
 
+const getFoodItemsIdsByCategory = async (categoryId) => {
+  return await FoodItem.query().select("id").where("food_item.category_id", "=", categoryId);
+};
+
 const patchFoodItem = async (data) => {
   await FoodItem.query().upsertGraph(data, {
     relate: true,
@@ -65,4 +69,5 @@ module.exports = {
   deleteFoodItem,
   updateFoodItemImage,
   getFoodItemWithPortions,
+  getFoodItemsIdsByCategory,
 };

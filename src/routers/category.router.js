@@ -28,6 +28,13 @@ module.exports = CategoryRouter;
  *          name:
  *            type: string
  *            required: true
+ *      PatchCategory:
+ *        type: object
+ *        properties:
+ *          name:
+ *            type: string
+ *          featuredItemId:
+ *            type: integer
  */
 
 /**
@@ -88,7 +95,7 @@ module.exports = CategoryRouter;
  *              content:
  *                  application/json:
  *                      schema:
- *                          $ref: '#/components/schemas/Category'
+ *                          $ref: '#/components/schemas/PatchCategory'
  *          responses:
  *              200:
  *                  description: Updated category object
