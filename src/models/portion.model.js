@@ -6,7 +6,7 @@ class Portion extends Model {
   static get relationMappings() {
     const FoodItem = require("./food-item.model");
     const Order = require("./order.model");
-    const Promotion = require("./promotion.model");
+    // const Promotion = require("./promotion.model");
 
     return {
       foodItems: {
@@ -39,19 +39,19 @@ class Portion extends Model {
           to: "order.id",
         },
       },
-      promotions: {
-        relation: Model.ManyToManyRelation,
-        modelClass: Promotion,
-        join: {
-          from: "portion.id",
-          through: {
-            from: "promotion_has_food_item_has_portion.portion_id",
-            to: "promotion_has_food_item_has_portion.promotion_id",
-            extra: ["quantity"],
-          },
-          to: "order.id",
-        },
-      },
+      // promotions: {
+      //   relation: Model.ManyToManyRelation,
+      //   modelClass: Promotion,
+      //   join: {
+      //     from: "portion.id",
+      //     through: {
+      //       from: "promotion_has_food_item_has_portion.portion_id",
+      //       to: "promotion_has_food_item_has_portion.promotion_id",
+      //       extra: ["quantity"],
+      //     },
+      //     to: "order.id",
+      //   },
+      // },
     };
   }
 }

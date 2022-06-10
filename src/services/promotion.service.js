@@ -3,15 +3,13 @@ const PromotionFooditemPortion = require("../models/promotion-fooditem-portion.m
 
 const getAllPromotions = async () => {
   // Get all promotions
-  const promotions = await Promotion.query();
+  return await Promotion.query().withGraphJoined("promotionItems");
 
-  // For each promotion get promotion items
-  for (let promotion of promotions) {
-    promotion.promotionItems = [];
-    promotion.promotionItems.push(await PromotionFooditemPortion.query().select("id", "foodItemId", "portionId", "quantity").where("promotionId", "=", promotion.id));
-  }
-
-  return promotions;
+  // // For each promotion get promotion items
+  // for (let promotion of promotions) {
+  //   promotion.promotionItems = [];
+  //   promotion.promotionItems.push(await PromotionFooditemPortion.query().select("id", "foodItemId", "portionId", "quantity").where("promotionId", "=", promotion.id));
+  // }
 };
 
 const createPromotion = async (promotionDetails, promotionItems) => {
@@ -20,19 +18,28 @@ const createPromotion = async (promotionDetails, promotionItems) => {
 
   promotion.promotionItems = [];
 
-  // Insert food items and portion in promotion
-  for (const { foodItemId, portionId, quantity } of promotionItems) {
-    promotion.promotionItems.push(
-      await PromotionFooditemPortion.query().insert({
-        promotionId: promotion.id,
-        foodItemId,
-        portionId,
-        quantity,
-      })
-    );
+  for (const item of promotionItems) {
+    promotion.promotionItems.push(await Promotion.relatedQuery("promotionItems").for(promotion.id).insert(item));
   }
 
+  // console.log(promotion);
+
   return promotion;
+  // let result = await Promotion.relatedQuery("promotionItems").for(promotion.id).insert(promotionItems);
+
+  // return result;
+
+  // // Insert food items and portion in promotion
+  // for (const { foodItemId, portionId, quantity } of promotionItems) {
+  //   promotion.promotionItems.push(
+  //     await PromotionFooditemPortion.query().insert({
+  //       promotionId: promotion.id,
+  //       foodItemId,
+  //       portionId,
+  //       quantity,
+  //     })
+  //   );
+  // }
 };
 
 const getPromotion = (id) => {
@@ -40,26 +47,11 @@ const getPromotion = (id) => {
 };
 
 const deletePromotion = async (id) => {
-  await Promotion.relatedQuery("promotionItems").for(id).unrelate();
+  // Delete entries in the join table
+  await PromotionFooditemPortion.query().delete().where("promotionId", id);
+
+  //Delete the promotion
   await Promotion.query().deleteById(id);
-};
-
-const updatePromotion = async (id, promotionDetails, promotionItems) => {
-  // Update promotion details
-  let promotion = await Promotion.query().patchAndFetchById(id, promotionDetails);
-
-  if (promotionItems.length) {
-    promotion.promotionItems = [];
-
-    await PromotionFooditemPortion.query().delete().where("promotion_id", id);
-
-    for (const item of promotionItems) {
-      item.promotionId = id;
-      promotion.promotionItems.push(await PromotionFooditemPortion.query().insert(item));
-    }
-  }
-
-  return promotion;
 };
 
 const updatePromotionImage = async (id, imgUrl) => {
@@ -75,7 +67,6 @@ module.exports = {
   getAllPromotions,
   deletePromotion,
   getPromotion,
-  updatePromotion,
   incrimentPromotionCount,
   updatePromotionImage,
 };

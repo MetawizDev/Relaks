@@ -1,5 +1,5 @@
 const { getFoodItem } = require("../services/food-item.services");
-const { createPromotion, getAllPromotions, deletePromotion, getPromotion, updatePromotion, updatePromotionImage } = require("../services/promotion.service");
+const { createPromotion, getAllPromotions, deletePromotion, getPromotion, updatePromotionImage } = require("../services/promotion.service");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
 const { getPortion } = require("../services/portion.service");
@@ -79,43 +79,6 @@ const deletePromotionHandler = () => {
   };
 };
 
-const updatePromotionHandler = () => {
-  return async (req, res, next) => {
-    try {
-      // Check for valid promotion
-      const promotionId = parseInt(req.params.id);
-
-      if (isNaN(promotionId) | (promotionId <= 0)) throw new NotAcceptableException("Promotion id must be a positive integer!");
-
-      if (!(await getPromotion(promotionId))) throw new NotFoundException("Promotion not found!");
-
-      // Check for valid food items and portions
-      const promotionItems = req.body.promotionItems ? req.body.promotionItems : [];
-
-      for (const { foodItemId, portionId } of promotionItems) {
-        if (!(await getFoodItem("id", foodItemId))) throw new NotFoundException(`Fooditem with ${foodItemId} not found!`);
-        if (!(await getPortion(portionId))) throw new NotFoundException(`Portion with ${portionId} not found!`);
-      }
-
-      const promotionDetails = {
-        description: req.body.description,
-        isDelivery: req.body.isDelivery,
-        discount: req.body.discount,
-      };
-
-      const promotion = await updatePromotion(promotionId, promotionDetails, promotionItems);
-
-      res.status(200).json({
-        message: "Promotion updated successfuly!",
-        success: true,
-        data: promotion,
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-};
-
 const checkPromotionHandler = () => {
   return async (req, res, next) => {
     try {
@@ -156,7 +119,6 @@ module.exports = {
   getAllPromotionsHandler,
   postPromotionHandler,
   deletePromotionHandler,
-  updatePromotionHandler,
   checkPromotionHandler,
   patchPromotionImageHandler,
 };

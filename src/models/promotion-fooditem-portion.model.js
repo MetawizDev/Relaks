@@ -5,9 +5,13 @@ class PromotionFooditemPortion extends Model {
     return "promotion_has_food_item_has_portion";
   }
 
-  //   static get idColumn() {
-  //     return ["food_item_id", "order_id", "portion_id"];
-  //   }
+  $formatJson(json) {
+    json = super.$formatJson(json);
+    delete json.createdAt;
+    delete json.updatedAt;
+    delete json.promotionId;
+    return json;
+  }
 
   static get relationMappings() {
     const FoodItem = require("./food-item.model");

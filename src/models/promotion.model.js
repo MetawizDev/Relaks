@@ -5,37 +5,25 @@ class Promotion extends Model {
     return "promotion";
   }
 
+  $formatJson(json) {
+    json = super.$formatJson(json);
+    delete json.createdAt;
+    delete json.updatedAt;
+    return json;
+  }
+
   static get relationMappings() {
-    const FoodItem = require("./food-item.model");
-    const Portion = require("./portion.model");
+    const PromotionFoodItemPortion = require("./promotion-fooditem-portion.model");
 
     return {
       promotionItems: {
-        relation: Model.ManyToManyRelation,
-        modelClass: FoodItem,
+        relation: Model.HasManyRelation,
+        modelClass: PromotionFoodItemPortion,
         join: {
           from: "promotion.id",
-          through: {
-            from: "promotion_has_food_item_has_portion.promotion_id",
-            to: "promotion_has_food_item_has_portion.food_item_id",
-            extra: ["quantity"],
-          },
-          to: "food_item.id",
+          to: "promotion_has_food_item_has_portion.promotionId",
         },
       },
-      // portions: {
-      //   relation: Model.ManyToManyRelation,
-      //   modelClass: Portion,
-      //   join: {
-      //     from: "promotion.id",
-      //     through: {
-      //       from: "promotion_has_food_item_has_portion.promotion_id",
-      //       to: "promotion_has_food_item_has_portion.portion_id",
-      //       extra: ["quantity"],
-      //     },
-      //     to: "portion.id",
-      //   },
-      // },
     };
   }
 }

@@ -11,7 +11,6 @@ const PromotionRouter = express.Router();
 PromotionRouter.get("/", getAllPromotionsHandler());
 PromotionRouter.post("/", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), ValidationMiddleware(postPromotion), postPromotionHandler());
 PromotionRouter.patch("/:id/image", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), checkPromotionHandler(), fileUploadMiddleware("promotion", 1), patchPromotionImageHandler());
-// PromotionRouter.patch("/:id", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), ValidationMiddleware(patchPromotion), updatePromotionHandler());
 PromotionRouter.delete("/:id", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), deletePromotionHandler());
 
 module.exports = PromotionRouter;
@@ -138,34 +137,3 @@ module.exports = PromotionRouter;
  *              401:
  *                  description: Authentication failed
  */
-
-//  *      patch:
-//  *          summary: Update promotion - owner, manager
-//  *          tags:
-//  *              -   Promotions
-//  *          parameters:
-//  *              -   in : path
-//  *                  name : id
-//  *                  required: true
-//  *                  description: promotion id
-//  *                  schema:
-//  *                      type: integer
-//  *          requestBody:
-//  *              required: true
-//  *              content:
-//  *                  application/json:
-//  *                      schema:
-//  *                          $ref: '#/components/schemas/Promotion'
-//  *          responses:
-//  *              200:
-//  *                  description: Promotion updated
-//  *              406:
-//  *                  description: Invalid query parameter
-//  *              404:
-//  *                  description: Promotion, fooditem, portion not found
-//  *              400:
-//  *                  description: Request body validation failed
-//  *              403:
-//  *                  description: No access rights
-//  *              401:
-//  *                  description: Authentication failed

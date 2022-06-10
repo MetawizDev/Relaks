@@ -9,7 +9,7 @@ class FoodItem extends Model {
     const Category = require("./category.model");
     const Portion = require("./portion.model");
     const Order = require("./order.model");
-    const Promotion = require("./promotion.model");
+    // const Promotion = require("./promotion.model");
 
     return {
       orders: {
@@ -25,19 +25,19 @@ class FoodItem extends Model {
           to: "order.id",
         },
       },
-      promotions: {
-        relation: Model.ManyToManyRelation,
-        modelClass: Promotion,
-        join: {
-          from: "food_item.id",
-          through: {
-            from: "promotion_has_food_item_has_portion.food_item_id",
-            to: "promotion_has_food_item_has_portion.promotion_id",
-            extra: ["quantity"],
-          },
-          to: "promotion.id",
-        },
-      },
+      // promotions: {
+      //   relation: Model.ManyToManyRelation,
+      //   modelClass: Promotion,
+      //   join: {
+      //     from: "food_item.id",
+      //     through: {
+      //       from: "promotion_has_food_item_has_portion.food_item_id",
+      //       to: "promotion_has_food_item_has_portion.promotion_id",
+      //       extra: ["quantity"],
+      //     },
+      //     to: "promotion.id",
+      //   },
+      // },
       category: {
         relation: Model.BelongsToOneRelation,
         modelClass: Category,
