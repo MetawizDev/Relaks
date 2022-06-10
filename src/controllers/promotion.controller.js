@@ -10,6 +10,10 @@ const getAllPromotionsHandler = () => {
     try {
       const promotions = await getAllPromotions();
 
+      promotions.forEach((promotion) => {
+        promotion.isExpired = addIsExpired(promotion.expiryDate);
+      });
+
       res.status(200).json({
         message: "Promotions fetched successfuly!",
         success: true,
@@ -21,6 +25,16 @@ const getAllPromotionsHandler = () => {
   };
 };
 
+const addIsExpired = (date) => {
+  const currentDateTime = new Date();
+  const expiryDate = new Date(date);
+  if (expiryDate <= currentDateTime) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
 const postPromotionHandler = () => {
   return async (req, res, next) => {
     try {
@@ -30,6 +44,7 @@ const postPromotionHandler = () => {
         discount: req.body.discount,
         totalPrice: req.body.totalPrice,
         count: 0,
+        expiryDate: new Date(req.body.expiryDate).toLocaleString("sv", { timeZone: "UTC" }),
       };
       const promotionItems = req.body.promotionItems ? req.body.promotionItems : [];
 
@@ -40,7 +55,9 @@ const postPromotionHandler = () => {
       }
 
       //   Create promotion
-      const promotion = await createPromotion(promotionDetails, promotionItems);
+      let promotion = await createPromotion(promotionDetails, promotionItems);
+
+      promotion.isExpired = addIsExpired(promotion.expiryDate);
 
       res.status(201).json({
         message: "Promotion created successfuly!",

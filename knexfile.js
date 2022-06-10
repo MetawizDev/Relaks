@@ -6,6 +6,7 @@ const connectionConfigs = {
   user: env.DB_USER,
   password: env.DB_PASSWORD,
   database: env.DB_NAME,
+  timezone: "Z",
 };
 
 // if (env.isProduction && env.GCP_INSTANCE_CONNECTION_NAME) {

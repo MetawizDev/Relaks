@@ -6,6 +6,7 @@ const Schema = {
     isDelivery: Joi.boolean().required(),
     discount: Joi.number().required(),
     totalPrice: Joi.number().required(),
+    expiryDate: Joi.date().iso().required(),
     promotionItems: Joi.array()
       .items({
         foodItemId: Joi.number().required(),
@@ -13,16 +14,6 @@ const Schema = {
         quantity: Joi.number().required(),
       })
       .required(),
-  }),
-  patchPromotion: Joi.object({
-    description: Joi.string(),
-    isDelivery: Joi.boolean(),
-    discount: Joi.number(),
-    promotionItems: Joi.array().items({
-      foodItemId: Joi.number().required(),
-      portionId: Joi.number().required(),
-      quantity: Joi.number().required(),
-    }),
   }),
 };
 

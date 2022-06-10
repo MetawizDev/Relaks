@@ -14,15 +14,13 @@ const getAllPromotions = async () => {
 
 const createPromotion = async (promotionDetails, promotionItems) => {
   // Insert promotion
-  let promotion = await Promotion.query().insert(promotionDetails);
+  let promotion = await Promotion.query().insertAndFetch(promotionDetails);
 
   promotion.promotionItems = [];
 
   for (const item of promotionItems) {
-    promotion.promotionItems.push(await Promotion.relatedQuery("promotionItems").for(promotion.id).insert(item));
+    promotion.promotionItems.push(await Promotion.relatedQuery("promotionItems").for(promotion.id).insertAndFetch(item));
   }
-
-  // console.log(promotion);
 
   return promotion;
   // let result = await Promotion.relatedQuery("promotionItems").for(promotion.id).insert(promotionItems);

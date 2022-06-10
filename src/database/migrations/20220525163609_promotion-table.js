@@ -9,7 +9,7 @@ exports.up = function (knex) {
     table.decimal("total_price").notNullable();
     table.decimal("discount").notNullable();
     table.string("img_url").unique();
-    // table.date("expiry_date");
+    table.timestamp("expiry_date").notNullable();
 
     // timestamps
     table.timestamps(true, true);

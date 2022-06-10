@@ -34,6 +34,10 @@ module.exports = PromotionRouter;
  *              totalPrice:
  *                  type: number
  *                  description: total price before discount
+ *              expiryDate:
+ *                  type: string
+ *                  description: date of expiry
+ *                  example: 2022-06-10T10:54:40.000Z
  *              promotionItems:
  *                  type: array
  *                  items:
