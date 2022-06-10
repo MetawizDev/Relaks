@@ -4,6 +4,7 @@ const UnauthorizedException = require('../common/exceptions/UnauthorizedExceptio
 const { getUser } = require("../services/auth.service");
 const User = require('../models/user.model');
 const roles = require('../models/roles');
+const loginType = require('../models/loginType');
 
 const FacebookStrategy = strategy.Strategy;
 
@@ -29,17 +30,18 @@ passport.use(new FacebookStrategy(
       last_name: lastName,
       username: id, 
       email,
-      role: roles.CUSTOMER
+      role: roles.CUSTOMER,
+      loginType: loginType.FACEBOOK
     };
 
     try {
       const existingUser = await getUser("username", id);
       if(existingUser) {
-        return done(null, {email, id});
+        return done(null, { email, id, loginType: loginType.FACEBOOK });
       } 
       // create entry in db
       await User.query().insert(userData);
-      done(null, {email, id});
+      done(null, { email, id, loginType: loginType.FACEBOOK });
       
     } catch (error) {
       done(error, false, error.message);

@@ -11,6 +11,7 @@ const authService = require("../services/auth.service");
 const mailConfig = require('../configs/mailConfig');
 
 const roles = require("../models/roles");
+const loginType = require("../models/loginType");
 
 const userRegisterHandler = (role) => {
   return async (req, res, next) => {
@@ -23,7 +24,7 @@ const userRegisterHandler = (role) => {
       req.body.role = role;
       if (role === roles.MANAGER) req.body.isActive = true;
       req.body.username = req.body.email;
-      let user = await authService.createUser(req.body);
+      let user = await authService.createUser({...req.body, loginType: loginType.EMAIL});
 
       res.status(201).json({
         message: `${role} created successfully.`,
@@ -62,6 +63,7 @@ const userLoginHandler = () => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
+        loginType: user.loginType
       };
 
       res.status(200).json({
@@ -104,6 +106,7 @@ const facebookSuccessLoginHandler = (req, res, next) => {
     message: "Facebook login success",
     accessToken,
     expiresIn: process.env.TOKEN_VALIDITY,
+    loginType: req.user.loginType
   });
 };
 
