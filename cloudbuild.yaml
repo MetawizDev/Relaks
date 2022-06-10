@@ -6,7 +6,7 @@ steps:
     env:
       - "SECRET=${_SECRET}"
       - "TOKEN_VALIDITY=${_TOKEN_VALIDITY}"
-      - "PORT=${PORT}"
+      - "PORT=${_PORT}"
       - "DB_HOST=${_DB_HOST}"
       - "DB_PORT=${_DB_PORT}"
       - "DB_USER=${_DB_USER}"
