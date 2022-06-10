@@ -11,6 +11,7 @@ exports.up = function (knex) {
     table.decimal("latitude").notNullable();
     table.decimal("longitude").notNullable();
     table.integer("user_id").unsigned().notNullable().references("id").inTable("user");
+    table.string("ref_id").notNullable();
 
     // timestamps
     table.timestamps(true, true);

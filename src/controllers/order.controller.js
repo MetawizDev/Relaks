@@ -18,7 +18,7 @@ exports.create_order = async (req, res, next) => {
 
   const promotionId = req.body.promotionId;
 
-  const { isDelivery, noOfItems, totalPrice, location, foodItems } = req.body;
+  const { isDelivery, noOfItems, totalPrice, location, foodItems, refId } = req.body;
   const { latitude, longitude } = location;
   const status = orderStatus.PENDING; // default status of an order when creating
 
@@ -47,7 +47,7 @@ exports.create_order = async (req, res, next) => {
     }
 
     // populating from user side
-    const order = await User.relatedQuery("orders").for(userId).insert({ isDelivery, noOfItems, totalPrice, latitude, longitude, status });
+    const order = await User.relatedQuery("orders").for(userId).insert({ isDelivery, noOfItems, totalPrice, latitude, longitude, status, refId });
     // making a relation to the join table
     const orderId = order.id;
     for (const { id: foodItemId, quantity, portionId, note } of foodItems) {
@@ -109,7 +109,7 @@ exports.update_order_status = async (req, res, next) => {
   const newStatus = req.body.status;
 
   try {
-    const { status: oldStatus, user } = await Order.query().findById(id).withGraphJoined("user").throwIfNotFound({ message: "Order does not exist" });
+    const { status: oldStatus, user, refId } = await Order.query().findById(id).withGraphJoined("user").throwIfNotFound({ message: "Order does not exist" });
 
     let isValidTransition = false;
     if (oldStatus === orderStatus.PENDING && (newStatus === orderStatus.ACCEPTED || newStatus === orderStatus.CANCELLED)) {
@@ -122,19 +122,28 @@ exports.update_order_status = async (req, res, next) => {
       Order.query()
         .patchAndFetchById(id, { status: newStatus })
         .then((data) => {
-          res.status(200).json({
-            message: `Order ${id} changed from ${oldStatus} to ${newStatus}`,
-          });
+          
           // notify the user
           const notification = `Your order has been ${newStatus}`;
-          socketServer.emitToRoom(user.username, 'order-status', {data: notification})
+          if(newStatus === orderStatus.CANCELLED) {
+            res.status(200).json({
+              message: `Order ${id} changed from ${oldStatus} to ${newStatus}`,
+              refId,
+            });
+            socketServer.emitToRoom(user.username, 'order-status', {data: notification, refId});
+          } else {
+            res.status(200).json({
+              message: `Order ${id} changed from ${oldStatus} to ${newStatus}`,
+            });
+            socketServer.emitToRoom(user.username, 'order-status', {data: notification});
+          }
           if(newStatus === orderStatus.COMPLETED) {
             const  email = user.email;
             if(email) {
               const body = `Your order has been completed. Your order id is ${id}.`
               mailConfig.sendMail('Hello from Relaks team!', body, email);
             } else {
-              console.log('User does not given an email. Cannot send an email notification.')
+              console.log('User does not given an email. Cannot send an email notification.');
             }
           }
         })

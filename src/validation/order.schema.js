@@ -6,6 +6,7 @@ const Schema = {
     noOfItems: Joi.number().required(),
     totalPrice: Joi.number().required(),
     promotionId: Joi.number(),
+    refId: Joi.string().required(),
     location: Joi.object({
       latitude: Joi.number().required(),
       longitude: Joi.number().required(),
