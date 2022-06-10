@@ -2,9 +2,18 @@ const nodemailer = require('nodemailer');
 
 
 exports.sendMail = async (subject, text, to) => {
+  // const transporter = nodemailer.createTransport({
+  //   host: 'smtp.gmail.com',
+  //   service: 'Gmail',
+  //   auth: {
+  //     user: process.env.MAIL,
+  //     pass: process.env.MAILPASSWORD
+  //   }
+  // });
+
   const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    service: 'Gmail',
+    host: 'smtp.ionos.fr',
+    port: 25,
     auth: {
       user: process.env.MAIL,
       pass: process.env.MAILPASSWORD
