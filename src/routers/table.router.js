@@ -7,12 +7,12 @@ const { postTable, patchTable, reserveTable } = require("../validation/table.sch
 
 const TableRouter = express.Router();
 
-TableRouter.get("/", getTablesHandler());
-TableRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postTable), createTableHandler());
-TableRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchTable), updateTableHandler());
-TableRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), deleteTableHandler());
+// TableRouter.get("/", getTablesHandler());
+// TableRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postTable), createTableHandler());
+// TableRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchTable), updateTableHandler());
+// TableRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), deleteTableHandler());
 
-TableRouter.post("/reserve-table", AuthorizationMiddleware([roles.CUSTOMER]), ValidationMiddleware(reserveTable), reserveTableHandler());
+// TableRouter.post("/reserve-table", AuthorizationMiddleware([roles.CUSTOMER]), ValidationMiddleware(reserveTable), reserveTableHandler());
 
 module.exports = TableRouter;
 

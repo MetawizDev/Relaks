@@ -42,11 +42,19 @@ class User extends Model {
         },
       },
       tables: {
-        relation: Model.HasManyRelation,
+        relation: Model.ManyToManyRelation,
         modelClass: Table,
         join: {
           from: "user.id",
-          to: "table.user_id",
+          through: {
+            from: "table_has_user.userId",
+            to: "table_has_user.tableId",
+            extra: {
+              checkIn: "check_in",
+              checkOut: "check_out",
+            },
+          },
+          to: "table.id",
         },
       },
     };

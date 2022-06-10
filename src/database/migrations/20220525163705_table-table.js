@@ -5,8 +5,8 @@ exports.up = function (knex) {
     table.increments("id").primary();
     table.integer("table_no", 25).notNullable().unique();
     table.integer("seating_capacity").notNullable();
-    table.timestamp("last_reserved_at");
-    table.integer("user_id").unsigned().references("id").inTable("user");
+    table.boolean("is_available").notNullable();
+    table.boolean("is_indoor").notNullable();
 
     // timestamps
     table.timestamps(true, true);
