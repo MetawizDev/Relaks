@@ -82,7 +82,7 @@ const deletePromotionHandler = () => {
       if (!promotion) throw new NotFoundException("Promotion not found!");
 
       if (promotion.imgUrl) {
-        deleteImageHandler(promotion.imgUrl);
+        await deleteImageHandler(promotion.imgUrl);
       }
       await deletePromotion(promotionId);
 
@@ -114,7 +114,7 @@ const patchPromotionImageHandler = () => {
   return async (req, res, next) => {
     try {
       const id = req.params.id;
-      const imgUrl = req.body.imgUrl;
+      const imgUrl = req.file.location;
 
       if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
 

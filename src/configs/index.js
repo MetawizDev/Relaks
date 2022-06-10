@@ -15,6 +15,10 @@ const env = cleanEnv(process.env, {
   FACEBOOK_CLIENT_SECRET: str(),
   FACEBOOK_CALLBACK_URL: str(),
   SESSION_KEY: str(),
+  AWS_ACCESS_KEY_ID: str(),
+  AWS_SECRET_ACCESS_KEY: str(),
+  AWS_REGION: str(),
+  AWS_BUCKET_NAME: str(),
 });
 
 module.exports = env;

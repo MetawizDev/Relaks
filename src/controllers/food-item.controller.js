@@ -115,7 +115,7 @@ const deleteFoodItemsHandler = () => {
 
       //Delete Food Item
       if (foodItem.imgUrl) {
-        deleteImageHandler(foodItem.imgUrl);
+        await deleteImageHandler(foodItem.imgUrl);
       }
       await deleteFoodItem(req.params.id);
 
@@ -147,7 +147,7 @@ const patchFoodItemImageHandler = () => {
   return async (req, res, next) => {
     try {
       const id = req.params.id;
-      const imgUrl = req.body.imgUrl;
+      const imgUrl = req.file.location;
 
       if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
 

@@ -50,8 +50,6 @@ initDatabase(knexConnection);
  *         description: Returns welcome message.
  */
 
-app.use("/static", express.static("public"));
-
 app.get("/", (req, res, next) => {
   res.json({
     message: "Welcome to cafe-app-api v1.",

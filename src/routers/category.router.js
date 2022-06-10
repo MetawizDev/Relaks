@@ -12,7 +12,7 @@ const CategoryRouter = express.Router();
 // Category Routers
 CategoryRouter.get("/", getAllCategoriesHandler());
 CategoryRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postCategory), postCategoryHandler());
-CategoryRouter.patch("/:id/image", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), checkCatergoryHandler(), fileUploadMiddleware("category", 1), patchCategoryImageHandler());
+CategoryRouter.patch("/:id/image", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), checkCatergoryHandler(), fileUploadMiddleware(1), patchCategoryImageHandler());
 CategoryRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchCategory), patchCategoryHandler());
 CategoryRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), deleteCategoryHandler());
 

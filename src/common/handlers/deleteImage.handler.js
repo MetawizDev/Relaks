@@ -1,13 +1,19 @@
-var fs = require("fs");
+const env = require("../../configs");
+const s3 = require("../../configs/s3Config");
+const { DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const NotFoundException = require("../exceptions/NotFoundException");
+const ConflictException = require("../exceptions/ConflictException");
 
-const deleteImageHandler = (imgUrl) => {
-  const path = `.${imgUrl.replace("static", "public")}`;
+const deleteImageHandler = async (imgUrl) => {
+  var bucketParams = {
+    Bucket: env.AWS_BUCKET_NAME,
+    Key: imgUrl,
+  };
 
   try {
-    fs.unlinkSync(path);
-  } catch (error) {
-    throw new NotFoundException("File not found");
+    return await s3.send(new DeleteObjectCommand(bucketParams));
+  } catch (err) {
+    throw new ConflictException("Delete image failed! Try again in some time!");
   }
 };
 

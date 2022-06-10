@@ -108,7 +108,7 @@ const deleteCategoryHandler = () => {
 
       // Delete category
       if (category[0].imgUrl) {
-        deleteImageHandler(category[0].imgUrl);
+        await deleteImageHandler(category[0].imgUrl);
       }
 
       await deleteCategory(req.params.id);
@@ -141,7 +141,7 @@ const patchCategoryImageHandler = () => {
   return async (req, res, next) => {
     try {
       const id = req.params.id;
-      const imgUrl = req.body.imgUrl;
+      const imgUrl = req.file.location;
 
       if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
 

@@ -14,7 +14,7 @@ const FoodItemRouter = express.Router();
 FoodItemRouter.get("/", getFoodItemsHandler());
 FoodItemRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postFoodItem), createFoodItemHandler());
 FoodItemRouter.get("/:id", getFoodItemHandler());
-FoodItemRouter.patch("/:id/image", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), checkFoodItemHandler(), fileUploadMiddleware("food-item", 1), patchFoodItemImageHandler());
+FoodItemRouter.patch("/:id/image", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), checkFoodItemHandler(), fileUploadMiddleware(1), patchFoodItemImageHandler());
 FoodItemRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(patchFoodItem), patchFoodItemHandler());
 FoodItemRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), deleteFoodItemsHandler());
 

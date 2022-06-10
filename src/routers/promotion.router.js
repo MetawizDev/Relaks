@@ -10,7 +10,7 @@ const PromotionRouter = express.Router();
 
 PromotionRouter.get("/", getAllPromotionsHandler());
 PromotionRouter.post("/", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), ValidationMiddleware(postPromotion), postPromotionHandler());
-PromotionRouter.patch("/:id/image", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), checkPromotionHandler(), fileUploadMiddleware("promotion", 1), patchPromotionImageHandler());
+PromotionRouter.patch("/:id/image", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), checkPromotionHandler(), fileUploadMiddleware(1), patchPromotionImageHandler());
 PromotionRouter.delete("/:id", AuthorizationMiddleware([roles.MANAGER, roles.OWNER]), deletePromotionHandler());
 
 module.exports = PromotionRouter;
