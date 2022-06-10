@@ -1,5 +1,6 @@
 const ConflictException = require("../common/exceptions/ConflictException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
+const ValidationException = require("../common/exceptions/ValidationException");
 const deleteImageHandler = require("../common/handlers/deleteImage.handler");
 
 const { getCategory } = require("../services/category.service");
