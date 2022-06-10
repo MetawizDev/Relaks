@@ -4,6 +4,7 @@ const Schema = {
   postTable: Joi.object({
     tableNo: Joi.number().required(),
     seatingCapacity: Joi.number().required(),
+    isIndoor: Joi.boolean().required(),
   }),
   patchTable: Joi.object({
     tableNo: Joi.number(),
