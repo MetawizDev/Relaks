@@ -2,6 +2,7 @@ const { getFoodItem } = require("../services/food-item.services");
 const { createPromotion, getAllPromotions, deletePromotion, getPromotion, updatePromotionImage } = require("../services/promotion.service");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
+const ValidationException = require("../common/exceptions/ValidationException");
 const { getPortion } = require("../services/portion.service");
 const deleteImageHandler = require("../common/handlers/deleteImage.handler");
 
@@ -114,9 +115,10 @@ const patchPromotionImageHandler = () => {
   return async (req, res, next) => {
     try {
       const id = req.params.id;
-      const imgUrl = req.file.location;
 
-      if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
+      if (!req.file) throw new ValidationException([{ message: "Invalid file." }]);
+
+      const imgUrl = req.file.location;
 
       // Update promotion image
       const promotion = await updatePromotionImage(id, imgUrl);

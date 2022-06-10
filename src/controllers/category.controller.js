@@ -141,9 +141,10 @@ const patchCategoryImageHandler = () => {
   return async (req, res, next) => {
     try {
       const id = req.params.id;
-      const imgUrl = req.file.location;
 
-      if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
+      if (!req.file) throw new ValidationException([{ message: "Invalid file." }]);
+
+      const imgUrl = req.file.location;
 
       // Update category image
       const category = await updateCategoryImage(id, imgUrl);

@@ -147,9 +147,10 @@ const patchFoodItemImageHandler = () => {
   return async (req, res, next) => {
     try {
       const id = req.params.id;
-      const imgUrl = req.file.location;
 
-      if (!imgUrl) throw new ValidationException([{ message: "Invalid file." }]);
+      if (!req.file) throw new ValidationException([{ message: "Invalid file." }]);
+
+      const imgUrl = req.file.location;
 
       // Update fooditem image
       const foodItem = await updateFoodItemImage(id, imgUrl);

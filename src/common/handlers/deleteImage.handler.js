@@ -7,7 +7,7 @@ const ConflictException = require("../exceptions/ConflictException");
 const deleteImageHandler = async (imgUrl) => {
   var bucketParams = {
     Bucket: env.AWS_BUCKET_NAME,
-    Key: imgUrl,
+    Key: imgUrl.split(".com/")[1],
   };
 
   try {
