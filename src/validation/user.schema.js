@@ -14,6 +14,13 @@ const Schema = {
     email: Joi.string().email().required().max(255),
     password: Joi.string().required(),
   }),
+  resetPasswordSchema: Joi.object({
+    token: Joi.string().required(),
+    email: Joi.string().required(),
+    password: Joi.string()
+      .pattern(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,64})/)
+      .required(),
+  }),
 };
 
 module.exports = Schema;

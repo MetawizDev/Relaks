@@ -11,6 +11,7 @@ exports.up = function (knex) {
     table.string("password");
     table.string("mobile").unique();
     table.string("role").notNullable();
+    table.string("reset_token");
 
     // timestamps
     table.timestamps(true, true);

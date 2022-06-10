@@ -1,12 +1,19 @@
 const express = require("express");
-const { userRegisterHandler, userLoginHandler, facebookSuccessLoginHandler, userUpdateHandler } = require("../controllers/auth.controller");
+const { 
+  userRegisterHandler, 
+  userLoginHandler, 
+  facebookSuccessLoginHandler, 
+  userUpdateHandler, 
+  requestPasswordReset, 
+  passwordReset 
+} = require("../controllers/auth.controller");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
 const userController = require("../controllers/user.controller");
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
-const { registerUser, loginUser } = require("../validation/user.schema");
+const { registerUser, loginUser, resetPasswordSchema } = require("../validation/user.schema");
 const roles = require("../models/roles");
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 
@@ -15,6 +22,10 @@ const AuthRouter = express.Router();
 // Register Routers
 AuthRouter.post("/manager/register", ValidationMiddleware(registerUser), userRegisterHandler(roles.MANAGER));
 AuthRouter.post("/customer/register", ValidationMiddleware(registerUser), userRegisterHandler(roles.CUSTOMER));
+
+// password reset
+AuthRouter.get("/password-reset", requestPasswordReset);
+AuthRouter.post("/password-reset", ValidationMiddleware(resetPasswordSchema), passwordReset);
 
 // Login routers
 AuthRouter.post("/login", ValidationMiddleware(loginUser), userLoginHandler());
@@ -144,4 +155,35 @@ module.exports = AuthRouter;
  *      summary: Login using facebook - customer register only
  *      tags:
  *        - auth
+ * /api/v1/auth/password-reset:
+ *    get:
+ *      summary: Request for a password reset link
+ *      tags:
+ *        - auth
+ *      parameters:
+ *      - in: query
+ *        name: email
+ *        description: Email of the user
+ * 
+ *    post:
+ *      summary: Send the password reset data
+ *      tags:
+ *        - auth
+ *      parameters:
+ *        - in: body
+ *          type: object
+ *          required:
+ *            - token
+ *            - email
+ *            - password
+ *          properties:
+ *            token:
+ *              type: string
+ *              description: Password reset token sent via the email
+ *            email:
+ *              type: string
+ *              description: Email of the user
+ *            password:
+ *              type: string
+ *              description: New password for the user
  */

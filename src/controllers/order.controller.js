@@ -9,7 +9,8 @@ const NotFoundException = require("../common/exceptions/NotFoundException");
 const orderStatus = require("../models/orderStatus");
 const roles = require("../models/roles");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
-const socketServer = require("../configs/socketConfig");
+const socketServer = require('../configs/socketConfig');
+const mailConfig = require('../configs/mailConfig');
 const { incrimentPromotionCount, getPromotion } = require("../services/promotion.service");
 
 exports.create_order = async (req, res, next) => {
@@ -126,7 +127,16 @@ exports.update_order_status = async (req, res, next) => {
           });
           // notify the user
           const notification = `Your order has been ${newStatus}`;
-          socketServer.emitToRoom(user.username, "order-status", { data: notification });
+          socketServer.emitToRoom(user.username, 'order-status', {data: notification})
+          if(newStatus === orderStatus.COMPLETED) {
+            const  email = user.email;
+            if(email) {
+              const body = `Your order has been completed. Your order id is ${id}.`
+              mailConfig.sendMail('Hello from Relaks team!', body, email);
+            } else {
+              console.log('User does not given an email. Cannot send an email notification.')
+            }
+          }
         })
         .catch((error) => {
           next(error);
