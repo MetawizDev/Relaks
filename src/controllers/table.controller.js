@@ -80,17 +80,24 @@ exports.reserve_table = async (req, res, next) => {
       canReserve = true;
     }
     for (const { id, checkIn: tableCheckIn, checkOut: tableCheckOut } of reservedTables) {
-      if (checkOut <= tableCheckIn || tableCheckOut <= checkIn) {
-        // available
+      console.log(checkIn, checkOut);
+      console.log(tableCheckIn, tableCheckOut);
+      if(checkOut < tableCheckIn || tableCheckOut < checkIn) { // available
         canReserve = true;
+        console.log('1')
         await TableUser.query().deleteById(id);
         break;
-      } else if ((checkIn - tableCheckIn) / (1000 * 60) >= 15 && isAvailable) {
+      } else if (checkIn.getTime() == tableCheckIn.getTime() && checkOut.getTime() == tableCheckOut.getTime()) {
+        console.log('2')
+        break;
+      } else if(((checkIn - tableCheckIn)/(1000*60) > 15) && isAvailable) {
         canReserve = true;
+        console.log('3')
         await TableUser.query().deleteById(id); // delete the old entry
         break;
-      } else if ((checkOut - tableCheckIn) / (1000 * 60) >= 15 && isAvailable) {
+      } else if(((checkOut - tableCheckIn)/(1000*60) > 15) && isAvailable) {
         canReserve = true;
+        console.log('4')
         await TableUser.query().deleteById(id); // delete the old entry
         break;
       }
