@@ -80,7 +80,6 @@ exports.reserve_table = async (req, res, next) => {
     if (!reservedTables.length) {
       canReserve = true;
     }
-    console.log(reservedTables);
 
     const values = [];
     for (const { id, checkIn: tableCheckIn, checkOut: tableCheckOut } of reservedTables) {
@@ -156,6 +155,33 @@ exports.update_table = async (req, res, next) => {
     } else {
       throw new NotAcceptableException("Table has reservations. Cannot update.");
     }
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.update_reservation_status = async (req, res, next) => {
+  const reservationId = req.params.id;
+
+  try {
+    const reservation = await TableUser.query()
+      .findById(reservationId)
+      .throwIfNotFound({ message: 'Reservation does not exist.' });
+    
+    const date = new Date(reservation.checkOut);
+    
+    scheduledJobs[reservationId].cancel();
+    delete scheduledJobs[reservationId];
+
+    const job = nodeSchedule.scheduleJob(date, async () => {
+      console.log('deleting reservation ', reservationId);
+      const deletedData = await TableUser.query().deleteById(reservationId);
+    }); 
+
+    res.status(200).json({
+      data: 'Successfully updated reservation status.'
+    });
+
   } catch (error) {
     next(error);
   }
