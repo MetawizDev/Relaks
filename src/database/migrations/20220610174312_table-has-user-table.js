@@ -7,6 +7,7 @@ exports.up = function (knex) {
     table.integer("table_id").unsigned().references("id").inTable("table").notNullable();
     table.timestamp("check_in").notNullable();
     table.timestamp("check_out").notNullable();
+    table.string("note");
 
     // timestamps
     table.timestamps(true, true);

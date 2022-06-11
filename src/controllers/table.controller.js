@@ -5,6 +5,9 @@ const NotAcceptableException = require("../common/exceptions/NotAcceptableExcept
 const socketServer = require("../configs/socketConfig");
 const Table = require("../models/table.model");
 const TableUser = require("../models/table-user.model");
+const nodeSchedule = require('node-schedule');
+
+let scheduledJobs = {};
 
 exports.getAllTablesHandler = () => {
   return async (req, res, next) => {
@@ -66,45 +69,43 @@ exports.getAllReservedTablesHandler = () => {
 };
 
 exports.reserve_table = async (req, res, next) => {
-  let { tableId, checkIn, checkOut } = req.body;
+  let { tableId, checkIn, checkOut, note } = req.body;
   checkIn = new Date(checkIn);
   checkOut = new Date(checkOut);
   const userId = req.user.id;
 
   try {
-    const { isAvailable } = await Table.query().findById(tableId).throwIfNotFound({ message: "Table does not exist" });
 
     let canReserve = false;
     const reservedTables = await TableUser.query().where("tableId", "=", tableId);
     if (!reservedTables.length) {
       canReserve = true;
     }
+    console.log(reservedTables);
+
+    const values = [];
     for (const { id, checkIn: tableCheckIn, checkOut: tableCheckOut } of reservedTables) {
       console.log(checkIn, checkOut);
       console.log(tableCheckIn, tableCheckOut);
-      if(checkOut < tableCheckIn || tableCheckOut < checkIn) { // available
-        canReserve = true;
-        console.log('1')
-        await TableUser.query().deleteById(id);
-        break;
-      } else if (checkIn.getTime() == tableCheckIn.getTime() && checkOut.getTime() == tableCheckOut.getTime()) {
-        console.log('2')
-        break;
-      } else if(((checkIn - tableCheckIn)/(1000*60) > 15) && isAvailable) {
-        canReserve = true;
-        console.log('3')
-        await TableUser.query().deleteById(id); // delete the old entry
-        break;
-      } else if(((checkOut - tableCheckIn)/(1000*60) > 15) && isAvailable) {
-        canReserve = true;
-        console.log('4')
-        await TableUser.query().deleteById(id); // delete the old entry
-        break;
+      if (checkOut < tableCheckIn || tableCheckOut < checkIn || checkIn.getTime() === tableCheckOut.getTime() || checkOut.getTime() === tableCheckIn.getTime()) { // available
+        values.push(true);
+      } else {
+        values.push(false);
       }
     }
 
+    canReserve = !values.includes(false);
+    
     if (canReserve) {
       const data = await TableUser.query().insertAndFetch({ userId, tableId, checkIn, checkOut });
+      const date = new Date(checkIn.setMinutes(checkIn.getMinutes() + 1));
+      const job = nodeSchedule.scheduleJob(date, async () => {
+        const deletedData = await TableUser.query().deleteById(data.id);
+        delete scheduledJobs[data.id];
+        console.log(scheduledJobs);
+      }); 
+      scheduledJobs[data.id] = job;
+      console.log(scheduledJobs);
       res.status(200).json({ canReserve, data });
     } else {
       throw new NotAcceptableException("Table already reserved.");

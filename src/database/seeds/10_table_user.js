@@ -19,7 +19,7 @@ exports.seed = function (knex) {
         },
         {
           user_id: 4,
-          table_id: 3,
+          table_id: 1,
           check_in: '2022-06-11 06:00:00',
           check_out: '2022-06-11 07:00:00'
         },

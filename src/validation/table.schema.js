@@ -14,6 +14,7 @@ const Schema = {
     tableId: Joi.number().required(),
     checkIn: Joi.date().iso().required(),
     checkOut: Joi.date().iso().required(),
+    note: Joi.string(),
   }),
 };
 
