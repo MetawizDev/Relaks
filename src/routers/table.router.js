@@ -3,13 +3,13 @@ const tableController = require("../controllers/table.controller");
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const roles = require("../models/roles");
-const { postTable, patchTable, reserveTable } = require("../validation/table.schema");
+const { postTable, patchTable, postReserveTable } = require("../validation/table.schema");
 
 const TableRouter = express.Router();
 
 TableRouter.get("/", tableController.getAllTablesHandler());
 TableRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postTable), tableController.createTableHandler());
-TableRouter.post("/reserve-table", tableController.reserve_table);
+TableRouter.post("/reserve-table", AuthorizationMiddleware([roles.CUSTOMER]), ValidationMiddleware(postReserveTable), tableController.reserve_table);
 
 module.exports = TableRouter;
 

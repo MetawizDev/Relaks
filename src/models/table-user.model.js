@@ -1,8 +1,13 @@
 const { Model } = require("objection");
 
-class PromotionFooditemPortion extends Model {
+class TableUser extends Model {
   static get tableName() {
     return "table_has_user";
+  }
+
+  async $beforeInsert() {
+    this.checkIn = this.checkIn.toLocaleString("sv", { timeZone: "UTC" });
+    this.checkOut = this.checkOut.toLocaleString("sv", { timeZone: "UTC" });
   }
 
   static get relationMappings() {
@@ -31,4 +36,4 @@ class PromotionFooditemPortion extends Model {
   }
 }
 
-module.exports = PromotionFooditemPortion;
+module.exports = TableUser;

@@ -10,8 +10,10 @@ const Schema = {
     tableNo: Joi.number(),
     seatingCapacity: Joi.number(),
   }),
-  reserveTable: Joi.object({
-    id: Joi.number().required(),
+  postReserveTable: Joi.object({
+    tableId: Joi.number().required(),
+    checkIn: Joi.date().iso().required(),
+    checkOut: Joi.date().iso().required(),
   }),
 };
 

@@ -49,12 +49,41 @@ exports.createTableHandler = () => {
 };
 
 exports.reserve_table = async (req, res, next) => {
-  const { checkIn: userCheckIn, checkOut: userCheckOut } = req.body;
-
-  try {
-    const data = await TableUser.query().withGraphJoined('user');
+  let { tableId, checkIn, checkOut } = req.body;
+  checkIn =  new Date(checkIn);
+  checkOut =  new Date(checkOut);
+  const userId = req.user.id;
   
-    res.status(200).json({ data });
+  try {
+    const { isAvailable } = await Table.query().findById(tableId).throwIfNotFound({ message: 'Table does not exist' });
+    
+    let canReserve = false;
+    const reservedTables = await TableUser.query().where('tableId', '=', tableId);
+    if(!reservedTables.length) {
+      canReserve = true;
+    }
+    for (const { id, checkIn: tableCheckIn, checkOut: tableCheckOut } of reservedTables) {
+      if(checkOut <= tableCheckIn || tableCheckOut <= checkIn) { // available
+        canReserve = true;
+        await TableUser.query().deleteById(id);
+        break;
+      } else if(((checkIn - tableCheckIn)/(1000*60) >= 15) && isAvailable) {
+        canReserve = true;
+        await TableUser.query().deleteById(id); // delete the old entry
+        break;
+      } else if(((checkOut - tableCheckIn)/(1000*60) >= 15) && isAvailable) {
+        canReserve = true;
+        await TableUser.query().deleteById(id); // delete the old entry
+        break;
+      }
+    }
+
+    if(canReserve) {
+      const data = await TableUser.query().insertAndFetch({ userId, tableId, checkIn, checkOut });
+      res.status(200).json({ canReserve, data });
+    } else {
+      throw new NotAcceptableException('Table already reserved.');
+    }
     
   } catch (error) {
     next(error);
