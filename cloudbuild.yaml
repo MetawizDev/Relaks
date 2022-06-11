@@ -20,6 +20,8 @@ steps:
       - "AWS_SECRET_ACCESS_KEY=${_AWS_SECRET_ACCESS_KEY}"
       - "AWS_REGION=${_AWS_REGION}"
       - "AWS_BUCKET_NAME=${_AWS_BUCKET_NAME}"
+      - "MAIL=${_MAIL}"
+      - "MAILPASSWORD=${_MAILPASSWORD}"
 
   - name: "gcr.io/cloud-builders/gcloud"
     args: ["app", "deploy"]
