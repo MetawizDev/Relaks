@@ -33,6 +33,20 @@ module.exports = TableRouter;
  *          isIndoor:
  *            type: boolean
  *            required: true
+ *      ReserveTable:
+ *        type: object
+ *        properties:
+ *          tableId:
+ *            type: integer
+ *            required: true
+ *          checkIn:
+ *            type: date
+ *            required: true
+ *            example: 2022-06-10T15:09:00.000Z
+ *          checkOut:
+ *            type: date
+ *            required: true
+ *            example: 2022-06-10T15:09:00.000Z
  */
 
 /**
@@ -67,5 +81,41 @@ module.exports = TableRouter;
  *                  description: No access rights
  *              401:
  *                  description: Authentication failed
+ * /api/v1/tables/{tableId}:
+ *      delete:
+ *          summary: Delete a non-reserved table
+ *          tags:
+ *              - Tables
+ *          responses:
+ *              200:
+ *                  description: Deleted table object
+ *
+ *      patch:
+ *          summary: Update a non-reserved table
+ *          tags:
+ *          - Tables
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/Table'
+ *          responses:
+ *              200:
+ *                  description: Updated table object
+ * /api/v1/tables/reserve-table:
+ *      post:
+ *          summary: Reserve a table
+ *          tags:
+ *          - Tables
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/schemas/ReserveTable'
+ *          responses:
+ *              200:
+ *                  description: Reserved table object
  *
  */
