@@ -1,10 +1,11 @@
 const tableService = require("../services/table.service");
 const ConflictException = require("../common/exceptions/ConflictException");
-const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
 const socketServer = require("../configs/socketConfig");
 const TableUser = require("../models/table-user.model");
+const Table = require("../models/table.model");
 const nodeSchedule = require("node-schedule");
+const roles = require('../models/roles');
 
 let scheduledJobs = {};
 
@@ -134,14 +135,17 @@ exports.reserve_table = async (req, res, next) => {
 
     if (canReserve) {
       const data = await TableUser.query().insertAndFetch({ userId, tableId, checkIn, checkOut, note });
-      const date = new Date(checkIn.setMinutes(checkIn.getMinutes() + 1));
+      const date = new Date(checkIn.setMinutes(checkIn.getMinutes() + 15));
       const job = nodeSchedule.scheduleJob(date, async () => {
         const deletedData = await TableUser.query().deleteById(data.id);
         delete scheduledJobs[data.id];
         console.log(scheduledJobs);
+        socketServer.emitToRoom(req.user.username, 'table-reserve', { data: `Table reservation cancelled`, tableId });
       });
       scheduledJobs[data.id] = job;
       console.log(scheduledJobs);
+
+      socketServer.emitToRoom(roles.MANAGER, "table-reserve", { data: `Table reservation for table id ${tableId}` });
       res.status(200).json({ canReserve, data });
     } else {
       throw new NotAcceptableException("Table already reserved.");
@@ -212,7 +216,7 @@ exports.update_reservation_status = async (req, res, next) => {
 
     const job = nodeSchedule.scheduleJob(date, async () => {
       console.log("deleting reservation ", reservationId);
-      const deletedData = await TableUser.query().deleteById(reservationId);
+      await TableUser.query().deleteById(reservationId);
     });
 
     res.status(200).json({
