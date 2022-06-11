@@ -85,8 +85,6 @@ exports.reserve_table = async (req, res, next) => {
 
     const values = [];
     for (const { id, checkIn: tableCheckIn, checkOut: tableCheckOut } of reservedTables) {
-      console.log(checkIn, checkOut);
-      console.log(tableCheckIn, tableCheckOut);
       if (checkOut < tableCheckIn || tableCheckOut < checkIn || checkIn.getTime() === tableCheckOut.getTime() || checkOut.getTime() === tableCheckIn.getTime()) { // available
         values.push(true);
       } else {
@@ -97,7 +95,7 @@ exports.reserve_table = async (req, res, next) => {
     canReserve = !values.includes(false);
     
     if (canReserve) {
-      const data = await TableUser.query().insertAndFetch({ userId, tableId, checkIn, checkOut });
+      const data = await TableUser.query().insertAndFetch({ userId, tableId, checkIn, checkOut, note });
       const date = new Date(checkIn.setMinutes(checkIn.getMinutes() + 1));
       const job = nodeSchedule.scheduleJob(date, async () => {
         const deletedData = await TableUser.query().deleteById(data.id);
@@ -109,6 +107,30 @@ exports.reserve_table = async (req, res, next) => {
       res.status(200).json({ canReserve, data });
     } else {
       throw new NotAcceptableException("Table already reserved.");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+
+exports.delete_table = async (req, res, next) => {
+  const tableId = req.params.id;
+
+  try {
+    const table = await Table.query().findById(tableId).throwIfNotFound({ message: 'Table does not exist.' });
+    
+    let canDelete = false;
+    const reservedTables = await TableUser.query().where("tableId", "=", tableId);
+    if (!reservedTables.length) {
+      canDelete = true;
+    }
+    
+    if (canDelete) {
+      await Table.query().deleteById(tableId);
+      res.status(200).json({ message: 'Table deleted successfully', table });
+    } else {
+      throw new NotAcceptableException("Table has reservations. Cannot delete.");
     }
   } catch (error) {
     next(error);
