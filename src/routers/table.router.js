@@ -70,7 +70,7 @@ module.exports = TableRouter;
  * @swagger
  * /api/v1/tables:
  *      get:
- *          summary: Get tables - public
+ *          summary: Get all tables - public
  *          tags:
  *              - Tables
  *          responses:
@@ -98,9 +98,10 @@ module.exports = TableRouter;
  *                  description: No access rights
  *              401:
  *                  description: Authentication failed
+ *
  * /api/v1/tables/{tableId}:
  *      delete:
- *          summary: Delete a non-reserved table
+ *          summary: Delete a non-reserved table - owner, manager
  *          tags:
  *              - Tables
  *          responses:
@@ -108,7 +109,7 @@ module.exports = TableRouter;
  *                  description: Deleted table object
  *
  *      patch:
- *          summary: Update a non-reserved table
+ *          summary: Update a non-reserved table - owner, manager
  *          tags:
  *          - Tables
  *          requestBody:
@@ -120,9 +121,10 @@ module.exports = TableRouter;
  *          responses:
  *              200:
  *                  description: Updated table object
+ *
  * /api/v1/tables/reserve-table:
  *      post:
- *          summary: Reserve a table
+ *          summary: Reserve a table - customer
  *          tags:
  *          - Tables
  *          requestBody:
@@ -137,10 +139,43 @@ module.exports = TableRouter;
  *
  * /api/v1/tables/reserve-table/{tableId}:
  *      get:
- *          summary: Update status when customer arrives
+ *          summary: Update status when customer arrives - owner, manager
  *          tags:
  *          - Tables
  *          responses:
  *              200:
  *                  description: Successfully updated user status
+ *
+ * /api/v1/tables/reservations:
+ *      get:
+ *          summary: Get all reservations - owner, manager
+ *          tags:
+ *          - Tables
+ *          responses:
+ *              200:
+ *                  description: All reservations
+ *
+ * /api/v1/tables/available-tables:
+ *      post:
+ *          summary: Reserve a table - customer
+ *          tags:
+ *          - Tables
+ *          requestBody:
+ *              required: true
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          type: object
+ *                          properties:
+ *                              checkIn:
+ *                                  type: date
+ *                                  required: true
+ *                                  example: 2022-06-10T15:09:00.000Z
+ *                              checkOut:
+ *                                  type: date
+ *                                  required: true
+ *                                  example: 2022-06-10T15:09:00.000Z
+ *          responses:
+ *              200:
+ *                  description: Reserved table object
  */
