@@ -119,4 +119,12 @@ module.exports = TableRouter;
  *              200:
  *                  description: Reserved table object
  *
+ * /api/v1/tables/reserve-table/{tableId}:
+ *      get:
+ *          summary: Update status when customer arrives
+ *          tags:
+ *          - Tables
+ *          responses:
+ *              200:
+ *                  description: Successfully updated user status
  */
