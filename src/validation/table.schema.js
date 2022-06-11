@@ -13,9 +13,13 @@ const Schema = {
   }),
   postReserveTable: Joi.object({
     tableId: Joi.number().required(),
-    checkIn: Joi.date().iso().required(),
-    checkOut: Joi.date().iso().required(),
+    checkIn: Joi.date().iso().required().greater("now"),
+    checkOut: Joi.date().iso().required().greater(Joi.ref("checkIn")),
     note: Joi.string(),
+  }),
+  postAvailableTables: Joi.object({
+    checkIn: Joi.date().iso().required().greater("now"),
+    checkOut: Joi.date().iso().required().greater(Joi.ref("checkIn")),
   }),
 };
 

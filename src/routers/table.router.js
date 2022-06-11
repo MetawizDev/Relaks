@@ -4,17 +4,33 @@ const { AuthorizationMiddleware } = require("../middlewares/authorization.middle
 const ValidationMiddleware = require("../middlewares/validation.middleware");
 const roles = require("../models/roles");
 const Table = require("../models/table.model");
-const { postTable, postReserveTable } = require("../validation/table.schema");
+const { postTable, postReserveTable, postAvailableTables } = require("../validation/table.schema");
 
 const TableRouter = express.Router();
 
+// Get all tables
 TableRouter.get("/", tableController.getAllTablesHandler());
+
+// Add new table
 TableRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postTable), tableController.createTableHandler());
+
+// Delete table
 TableRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), tableController.delete_table);
+
+// Update table
 TableRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), tableController.update_table);
+
+// Reserve table
 TableRouter.post("/reserve-table", AuthorizationMiddleware([roles.CUSTOMER]), ValidationMiddleware(postReserveTable), tableController.reserve_table);
+
+// Update reservation when customer arrives
 TableRouter.get("/reserve-table/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), tableController.update_reservation_status);
-TableRouter.get("/reserved-tables", tableController.getAllReservedTablesHandler());
+
+//Get all reservations
+TableRouter.get("/reservations", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), tableController.getAllReservationsHandler());
+
+//Get available tables given a time
+TableRouter.post("/available-tables", ValidationMiddleware(postAvailableTables), tableController.getAvailableTablesByTimeHandler());
 
 module.exports = TableRouter;
 

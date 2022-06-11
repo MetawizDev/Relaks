@@ -3,9 +3,8 @@ const ConflictException = require("../common/exceptions/ConflictException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
 const socketServer = require("../configs/socketConfig");
-const Table = require("../models/table.model");
 const TableUser = require("../models/table-user.model");
-const nodeSchedule = require('node-schedule');
+const nodeSchedule = require("node-schedule");
 
 let scheduledJobs = {};
 
@@ -50,16 +49,57 @@ exports.createTableHandler = () => {
   };
 };
 
-exports.getAllReservedTablesHandler = () => {
+exports.getAllReservationsHandler = () => {
   return async (req, res, next) => {
     try {
       // Get all reserved tables
-      const reservedTables = await tableService.getAllReservedTables();
+      const reservedTables = await tableService.getAllReservationsWithUser();
 
       res.status(201).json({
         message: "Table created successfully!",
         success: true,
         data: reservedTables,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+exports.getAvailableTablesByTimeHandler = () => {
+  return async (req, res, next) => {
+    try {
+      checkIn = new Date(req.body.checkIn);
+      checkOut = new Date(req.body.checkOut);
+
+      // Get all reserved tables
+      const reservations = await tableService.getAllReservations();
+
+      // Get all tables
+      const allTables = await tableService.getAllTables();
+      let allTableIds = allTables.map((table) => table.id);
+
+      allTableIds.forEach((tableId) => {
+        let availability = [];
+
+        const tableReservations = reservations.filter((reservation) => reservation.tableId === tableId);
+
+        tableReservations.forEach((reservation) => {
+          if (checkOut < reservation.checkIn || reservation.checkOut < checkIn || checkIn.getTime() === reservation.checkOut.getTime() || checkOut.getTime() === reservation.checkIn.getTime()) {
+            availability.push(true);
+          } else {
+            availability.push(false);
+          }
+        });
+        if (availability.includes(false)) {
+          allTables = allTables.filter((table) => table.id != tableId);
+        }
+      });
+
+      res.status(200).json({
+        message: "Fetched available tables sucessfully!",
+        success: true,
+        data: { availableTableIds: allTables },
       });
     } catch (error) {
       next(error);
@@ -74,7 +114,6 @@ exports.reserve_table = async (req, res, next) => {
   const userId = req.user.id;
 
   try {
-
     let canReserve = false;
     const reservedTables = await TableUser.query().where("tableId", "=", tableId);
     if (!reservedTables.length) {
@@ -83,7 +122,8 @@ exports.reserve_table = async (req, res, next) => {
 
     const values = [];
     for (const { id, checkIn: tableCheckIn, checkOut: tableCheckOut } of reservedTables) {
-      if (checkOut < tableCheckIn || tableCheckOut < checkIn || checkIn.getTime() === tableCheckOut.getTime() || checkOut.getTime() === tableCheckIn.getTime()) { // available
+      if (checkOut < tableCheckIn || tableCheckOut < checkIn || checkIn.getTime() === tableCheckOut.getTime() || checkOut.getTime() === tableCheckIn.getTime()) {
+        // available
         values.push(true);
       } else {
         values.push(false);
@@ -91,7 +131,7 @@ exports.reserve_table = async (req, res, next) => {
     }
 
     canReserve = !values.includes(false);
-    
+
     if (canReserve) {
       const data = await TableUser.query().insertAndFetch({ userId, tableId, checkIn, checkOut, note });
       const date = new Date(checkIn.setMinutes(checkIn.getMinutes() + 1));
@@ -99,7 +139,7 @@ exports.reserve_table = async (req, res, next) => {
         const deletedData = await TableUser.query().deleteById(data.id);
         delete scheduledJobs[data.id];
         console.log(scheduledJobs);
-      }); 
+      });
       scheduledJobs[data.id] = job;
       console.log(scheduledJobs);
       res.status(200).json({ canReserve, data });
@@ -111,22 +151,21 @@ exports.reserve_table = async (req, res, next) => {
   }
 };
 
-
 exports.delete_table = async (req, res, next) => {
   const tableId = req.params.id;
 
   try {
-    const table = await Table.query().findById(tableId).throwIfNotFound({ message: 'Table does not exist.' });
-    
+    const table = await Table.query().findById(tableId).throwIfNotFound({ message: "Table does not exist." });
+
     let canDelete = false;
     const reservedTables = await TableUser.query().where("tableId", "=", tableId);
     if (!reservedTables.length) {
       canDelete = true;
     }
-    
+
     if (canDelete) {
       await Table.query().deleteById(tableId);
-      res.status(200).json({ message: 'Table deleted successfully', table });
+      res.status(200).json({ message: "Table deleted successfully", table });
     } else {
       throw new NotAcceptableException("Table has reservations. Cannot delete.");
     }
@@ -141,17 +180,17 @@ exports.update_table = async (req, res, next) => {
   const { tableNo, seatingCapacity, isIndoor } = req.body;
 
   try {
-    await Table.query().findById(tableId).throwIfNotFound({ message: 'Table does not exist.' });
-    
+    await Table.query().findById(tableId).throwIfNotFound({ message: "Table does not exist." });
+
     let canUpdate = false;
     const reservedTables = await TableUser.query().where("tableId", "=", tableId);
     if (!reservedTables.length) {
       canUpdate = true;
     }
-    
+
     if (canUpdate) {
       const updatedTable = await Table.query().patchAndFetchById(tableId, { tableNo, seatingCapacity, isIndoor });
-      res.status(200).json({ message: 'Table updated successfully', updatedTable });
+      res.status(200).json({ message: "Table updated successfully", updatedTable });
     } else {
       throw new NotAcceptableException("Table has reservations. Cannot update.");
     }
@@ -164,24 +203,21 @@ exports.update_reservation_status = async (req, res, next) => {
   const reservationId = req.params.id;
 
   try {
-    const reservation = await TableUser.query()
-      .findById(reservationId)
-      .throwIfNotFound({ message: 'Reservation does not exist.' });
-    
+    const reservation = await TableUser.query().findById(reservationId).throwIfNotFound({ message: "Reservation does not exist." });
+
     const date = new Date(reservation.checkOut);
-    
+
     scheduledJobs[reservationId].cancel();
     delete scheduledJobs[reservationId];
 
     const job = nodeSchedule.scheduleJob(date, async () => {
-      console.log('deleting reservation ', reservationId);
+      console.log("deleting reservation ", reservationId);
       const deletedData = await TableUser.query().deleteById(reservationId);
-    }); 
-
-    res.status(200).json({
-      data: 'Successfully updated reservation status.'
     });
 
+    res.status(200).json({
+      data: "Successfully updated reservation status.",
+    });
   } catch (error) {
     next(error);
   }
