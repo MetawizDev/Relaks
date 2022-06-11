@@ -9,6 +9,7 @@ const Schema = {
   patchTable: Joi.object({
     tableNo: Joi.number(),
     seatingCapacity: Joi.number(),
+    isIndoor: Joi.boolean(),
   }),
   postReserveTable: Joi.object({
     tableId: Joi.number().required(),

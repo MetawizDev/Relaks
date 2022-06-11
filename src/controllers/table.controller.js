@@ -32,13 +32,12 @@ exports.createTableHandler = () => {
         tableNo: req.body.tableNo,
         isIndoor: req.body.isIndoor,
         seatingCapacity: req.body.seatingCapacity,
-        isAvailable: true,
       };
       // Check for existing table
       if (await tableService.getTable("tableNo", data.tableNo)) throw new ConflictException("Table already exists!");
 
       // Create table
-      const table = await createTable(data);
+      const table = await tableService.createTable(data);
 
       res.status(201).json({
         message: "Table created successfully!",
@@ -131,6 +130,31 @@ exports.delete_table = async (req, res, next) => {
       res.status(200).json({ message: 'Table deleted successfully', table });
     } else {
       throw new NotAcceptableException("Table has reservations. Cannot delete.");
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.update_table = async (req, res, next) => {
+  const tableId = req.params.id;
+
+  const { tableNo, seatingCapacity, isIndoor } = req.body;
+
+  try {
+    await Table.query().findById(tableId).throwIfNotFound({ message: 'Table does not exist.' });
+    
+    let canUpdate = false;
+    const reservedTables = await TableUser.query().where("tableId", "=", tableId);
+    if (!reservedTables.length) {
+      canUpdate = true;
+    }
+    
+    if (canUpdate) {
+      const updatedTable = await Table.query().patchAndFetchById(tableId, { tableNo, seatingCapacity, isIndoor });
+      res.status(200).json({ message: 'Table updated successfully', updatedTable });
+    } else {
+      throw new NotAcceptableException("Table has reservations. Cannot update.");
     }
   } catch (error) {
     next(error);

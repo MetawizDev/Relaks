@@ -11,6 +11,7 @@ const TableRouter = express.Router();
 TableRouter.get("/", tableController.getAllTablesHandler());
 TableRouter.post("/", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), ValidationMiddleware(postTable), tableController.createTableHandler());
 TableRouter.delete("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), tableController.delete_table);
+TableRouter.patch("/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), tableController.update_table);
 TableRouter.post("/reserve-table", AuthorizationMiddleware([roles.CUSTOMER]), ValidationMiddleware(postReserveTable), tableController.reserve_table);
 TableRouter.get("/reserved-tables", tableController.getAllReservedTablesHandler());
 
