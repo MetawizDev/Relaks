@@ -38,6 +38,16 @@ exports.seed = function (knex) {
           role: roles.CUSTOMER,
           login_type: loginType.EMAIL,
         },
+        {
+          first_name: "customer2",
+          last_name: "customer2",
+          email: "customer2@cafeapp.com",
+          username: "customer2@cafeapp.com",
+          password: "$2a$12$G0AwSHUELJZjxWfXgkPdQOT6rkW.JHajj69bVzPECjua8erv0YJky",
+          mobile: "0731234567",
+          role: roles.CUSTOMER,
+          login_type: loginType.EMAIL,
+        },
       ]);
     });
 };

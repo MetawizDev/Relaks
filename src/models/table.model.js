@@ -6,22 +6,14 @@ class Table extends Model {
   }
 
   static relationMappings() {
-    const User = require("./user.model");
+    const TableUser = require("./table-user.model");
     return {
-      users: {
+      reservations: {
         relation: Model.ManyToManyRelation,
-        modelClass: User,
+        modelClass: TableUser,
         join: {
           from: "table.id",
-          through: {
-            from: "table_has_user.tableId",
-            to: "table_has_user.userId",
-            extra: {
-              checkIn: "check_in",
-              checkOut: "check_out",
-            },
-          },
-          to: "user.id",
+          to: "table_has_user.table_id",
         },
       },
     };

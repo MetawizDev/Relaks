@@ -19,6 +19,8 @@ const env = cleanEnv(process.env, {
   AWS_SECRET_ACCESS_KEY: str(),
   AWS_REGION: str(),
   AWS_BUCKET_NAME: str(),
+  MAIL: str(),
+  MAILPASSWORD: str(),
 });
 
 module.exports = env;

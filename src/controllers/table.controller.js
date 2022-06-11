@@ -3,8 +3,10 @@ const ConflictException = require("../common/exceptions/ConflictException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
 const socketServer = require("../configs/socketConfig");
+const Table = require("../models/table.model");
+const TableUser = require("../models/table-user.model");
 
-const getAllTablesHandler = () => {
+exports.getAllTablesHandler = () => {
   return async (req, res, next) => {
     try {
       const tables = await getAllTables();
@@ -20,7 +22,7 @@ const getAllTablesHandler = () => {
   };
 };
 
-const createTableHandler = () => {
+exports.createTableHandler = () => {
   return async (req, res, next) => {
     try {
       const data = {
@@ -46,7 +48,15 @@ const createTableHandler = () => {
   };
 };
 
-module.exports = {
-  createTableHandler,
-  getAllTablesHandler,
-};
+exports.reserve_table = async (req, res, next) => {
+  const { checkIn: userCheckIn, checkOut: userCheckOut } = req.body;
+
+  try {
+    const data = await TableUser.query().withGraphJoined('user');
+  
+    res.status(200).json({ data });
+    
+  } catch (error) {
+    next(error);
+  }
+}
