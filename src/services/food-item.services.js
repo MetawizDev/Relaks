@@ -60,6 +60,10 @@ const updateFoodItemImage = async (id, imgUrl) => {
   return await FoodItem.query().patchAndFetchById(id, { imgUrl });
 };
 
+const changeAvailability = async (id, isAvailable, portionId) => {
+  return await FoodItem.relatedQuery("portions").for(id).patch({ isAvailable }).where("portionId", portionId);
+};
+
 module.exports = {
   getAllFoodItems,
   getFoodItem,
@@ -70,4 +74,5 @@ module.exports = {
   updateFoodItemImage,
   getFoodItemWithPortions,
   getFoodItemsIdsByCategory,
+  changeAvailability,
 };

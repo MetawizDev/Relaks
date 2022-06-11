@@ -4,7 +4,7 @@ const ValidationException = require("../common/exceptions/ValidationException");
 const deleteImageHandler = require("../common/handlers/deleteImage.handler");
 
 const { getCategory } = require("../services/category.service");
-const { getAllFoodItems, createFoodItem, getFoodItem, getFoodItemsByCategory, patchFoodItem, deleteFoodItem, updateFoodItemImage, getFoodItemWithPortions } = require("../services/food-item.services");
+const { getAllFoodItems, createFoodItem, getFoodItem, getFoodItemsByCategory, patchFoodItem, deleteFoodItem, updateFoodItemImage, getFoodItemWithPortions, changeAvailability } = require("../services/food-item.services");
 const { getPortion } = require("../services/portion.service");
 
 const getFoodItemsHandler = () => {
@@ -185,6 +185,29 @@ const getFoodItemHandler = () => {
   };
 };
 
+const changeFoodAvailabilityHandler = () => {
+  return async (req, res, next) => {
+    try {
+      // Check for valid fooditem
+      const foodItem = await getFoodItem("id", req.params.id);
+      if (!foodItem) throw new NotFoundException("Food item does not exist!");
+
+      // Check for valid portion
+      if (!(await getPortion(req.body.portionId))) throw new NotFoundException("Portion does not exist!");
+
+      //Change availabilty
+      await changeAvailability(req.params.id, req.body.isAvailable, req.body.portionId);
+
+      res.status(200).json({
+        message: "Availability changed succesfully",
+        success: true,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 module.exports = {
   getFoodItemsHandler,
   createFoodItemHandler,
@@ -193,4 +216,5 @@ module.exports = {
   checkFoodItemHandler,
   patchFoodItemImageHandler,
   getFoodItemHandler,
+  changeFoodAvailabilityHandler,
 };

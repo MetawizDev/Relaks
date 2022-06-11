@@ -23,6 +23,10 @@ const Schema = {
       isAvailable: Joi.boolean(),
     }),
   }),
+  patchAvailability: Joi.object({
+    portionId: Joi.number().required(),
+    isAvailable: Joi.boolean().required(),
+  }),
 };
 
 module.exports = Schema;
