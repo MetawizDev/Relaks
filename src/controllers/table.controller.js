@@ -1,4 +1,4 @@
-const { getTable, createTable, getAllTables } = require("../services/table.service");
+const tableService = require("../services/table.service");
 const ConflictException = require("../common/exceptions/ConflictException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
@@ -9,7 +9,7 @@ const TableUser = require("../models/table-user.model");
 exports.getAllTablesHandler = () => {
   return async (req, res, next) => {
     try {
-      const tables = await getAllTables();
+      const tables = await tableService.getAllTables();
 
       res.status(200).json({
         message: "Tables fetched successfuly",
@@ -32,7 +32,7 @@ exports.createTableHandler = () => {
         isAvailable: true,
       };
       // Check for existing table
-      if (await getTable("tableNo", data.tableNo)) throw new ConflictException("Table already exists!");
+      if (await tableService.getTable("tableNo", data.tableNo)) throw new ConflictException("Table already exists!");
 
       // Create table
       const table = await createTable(data);
@@ -48,44 +48,61 @@ exports.createTableHandler = () => {
   };
 };
 
+exports.getAllReservedTablesHandler = () => {
+  return async (req, res, next) => {
+    try {
+      // Get all reserved tables
+      const reservedTables = await tableService.getAllReservedTables();
+
+      res.status(201).json({
+        message: "Table created successfully!",
+        success: true,
+        data: reservedTables,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 exports.reserve_table = async (req, res, next) => {
   let { tableId, checkIn, checkOut } = req.body;
-  checkIn =  new Date(checkIn);
-  checkOut =  new Date(checkOut);
+  checkIn = new Date(checkIn);
+  checkOut = new Date(checkOut);
   const userId = req.user.id;
-  
+
   try {
-    const { isAvailable } = await Table.query().findById(tableId).throwIfNotFound({ message: 'Table does not exist' });
-    
+    const { isAvailable } = await Table.query().findById(tableId).throwIfNotFound({ message: "Table does not exist" });
+
     let canReserve = false;
-    const reservedTables = await TableUser.query().where('tableId', '=', tableId);
-    if(!reservedTables.length) {
+    const reservedTables = await TableUser.query().where("tableId", "=", tableId);
+    if (!reservedTables.length) {
       canReserve = true;
     }
     for (const { id, checkIn: tableCheckIn, checkOut: tableCheckOut } of reservedTables) {
-      if(checkOut <= tableCheckIn || tableCheckOut <= checkIn) { // available
+      if (checkOut <= tableCheckIn || tableCheckOut <= checkIn) {
+        // available
         canReserve = true;
         await TableUser.query().deleteById(id);
         break;
-      } else if(((checkIn - tableCheckIn)/(1000*60) >= 15) && isAvailable) {
+      } else if ((checkIn - tableCheckIn) / (1000 * 60) >= 15 && isAvailable) {
         canReserve = true;
         await TableUser.query().deleteById(id); // delete the old entry
         break;
-      } else if(((checkOut - tableCheckIn)/(1000*60) >= 15) && isAvailable) {
+      } else if ((checkOut - tableCheckIn) / (1000 * 60) >= 15 && isAvailable) {
         canReserve = true;
         await TableUser.query().deleteById(id); // delete the old entry
         break;
       }
     }
 
-    if(canReserve) {
+    if (canReserve) {
       const data = await TableUser.query().insertAndFetch({ userId, tableId, checkIn, checkOut });
       res.status(200).json({ canReserve, data });
     } else {
-      throw new NotAcceptableException('Table already reserved.');
+      throw new NotAcceptableException("Table already reserved.");
     }
-    
   } catch (error) {
     next(error);
   }
-}
+};

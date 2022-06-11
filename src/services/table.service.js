@@ -1,20 +1,18 @@
 const Table = require("../models/table.model");
-const { raw } = require("objection");
+const TableUser = require("../models/table-user.model");
 
-const getTable = async (key, value) => {
+exports.getTable = async (key, value) => {
   return await Table.query().where(key, "=", value).first();
 };
 
-const createTable = async (data) => {
+exports.createTable = async (data) => {
   return await Table.query().insertAndFetch(data);
 };
 
-const getAllTables = async () => {
+exports.getAllTables = async () => {
   return await Table.query();
 };
 
-module.exports = {
-  getTable,
-  createTable,
-  getAllTables,
+exports.getAllReservedTables = async () => {
+  return TableUser.query().withGraphJoined("user").select("table_has_user.id", "table_has_user.checkIn", "table_has_user.checkOut");
 };
