@@ -5,7 +5,7 @@ const socketServer = require("../configs/socketConfig");
 const TableUser = require("../models/table-user.model");
 const Table = require("../models/table.model");
 const nodeSchedule = require("node-schedule");
-const roles = require('../models/roles');
+const roles = require("../models/roles");
 
 let scheduledJobs = {};
 
@@ -77,7 +77,7 @@ exports.getAvailableTablesByTimeHandler = () => {
       const reservations = await tableService.getAllReservations();
 
       // Get all tables
-      const allTables = await tableService.getAllTables();
+      let allTables = await tableService.getAllTables();
       let allTableIds = allTables.map((table) => table.id);
 
       allTableIds.forEach((tableId) => {
@@ -140,7 +140,7 @@ exports.reserve_table = async (req, res, next) => {
         const deletedData = await TableUser.query().deleteById(data.id);
         delete scheduledJobs[data.id];
         console.log(scheduledJobs);
-        socketServer.emitToRoom(req.user.username, 'table-reserve', { data: `Table reservation cancelled`, tableId });
+        socketServer.emitToRoom(req.user.username, "table-reserve", { data: `Table reservation cancelled`, tableId });
       });
       scheduledJobs[data.id] = job;
       console.log(scheduledJobs);
