@@ -1,12 +1,19 @@
-const { Model } = require('objection');
+const { Model } = require("objection");
 
 class OrderFooditemPortion extends Model {
   static get tableName() {
-    return 'order_has_food_item_has_portion';
+    return "order_has_food_item_has_portion";
+  }
+
+  $formatJson(json) {
+    json = super.$formatJson(json);
+    delete json.createdAt;
+    delete json.updatedAt;
+    return json;
   }
 
   static get idColumn() {
-    return ['food_item_id', 'order_id', 'portion_id'];
+    return ["food_item_id", "order_id", "portion_id"];
   }
 
   static get relationMappings() {
@@ -19,28 +26,28 @@ class OrderFooditemPortion extends Model {
         relation: Model.BelongsToOneRelation,
         modelClass: Order,
         join: {
-          from: 'order_has_food_item_has_portion.order_id',
-          to: 'order.id'
-        }
+          from: "order_has_food_item_has_portion.order_id",
+          to: "order.id",
+        },
       },
 
       foodItems: {
         relation: Model.BelongsToOneRelation,
         modelClass: FoodItem,
         join: {
-          from: 'order_has_food_item_has_portion.food_item_id',
-          to: 'food_item.id'
-        }
+          from: "order_has_food_item_has_portion.food_item_id",
+          to: "food_item.id",
+        },
       },
 
       portions: {
         relation: Model.BelongsToOneRelation,
         modelClass: Portion,
         join: {
-          from: 'order_has_food_item_has_portion.portion_id',
-          to: 'portion.id'
-        }
-      }
+          from: "order_has_food_item_has_portion.portion_id",
+          to: "portion.id",
+        },
+      },
     };
   }
 }

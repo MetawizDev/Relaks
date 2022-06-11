@@ -5,11 +5,17 @@ class FoodItem extends Model {
     return "food_item";
   }
 
+  $formatJson(json) {
+    json = super.$formatJson(json);
+    delete json.createdAt;
+    delete json.updatedAt;
+    return json;
+  }
+
   static get relationMappings() {
     const Category = require("./category.model");
     const Portion = require("./portion.model");
     const Order = require("./order.model");
-    // const Promotion = require("./promotion.model");
 
     return {
       orders: {
@@ -25,19 +31,6 @@ class FoodItem extends Model {
           to: "order.id",
         },
       },
-      // promotions: {
-      //   relation: Model.ManyToManyRelation,
-      //   modelClass: Promotion,
-      //   join: {
-      //     from: "food_item.id",
-      //     through: {
-      //       from: "promotion_has_food_item_has_portion.food_item_id",
-      //       to: "promotion_has_food_item_has_portion.promotion_id",
-      //       extra: ["quantity"],
-      //     },
-      //     to: "promotion.id",
-      //   },
-      // },
       category: {
         relation: Model.BelongsToOneRelation,
         modelClass: Category,

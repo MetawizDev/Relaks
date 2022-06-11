@@ -10,6 +10,9 @@ class PromotionFooditemPortion extends Model {
     delete json.createdAt;
     delete json.updatedAt;
     delete json.promotionId;
+    delete json.id;
+    delete json.foodItemId;
+    delete json.portionId;
     return json;
   }
 

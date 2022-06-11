@@ -5,6 +5,13 @@ class Table extends Model {
     return "table";
   }
 
+  $formatJson(json) {
+    json = super.$formatJson(json);
+    delete json.createdAt;
+    delete json.updatedAt;
+    return json;
+  }
+
   static relationMappings() {
     const TableUser = require("./table-user.model");
     return {

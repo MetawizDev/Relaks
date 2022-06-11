@@ -10,6 +10,13 @@ class TableUser extends Model {
     this.checkOut = this.checkOut.toLocaleString("sv", { timeZone: "UTC" });
   }
 
+  $formatJson(json) {
+    json = super.$formatJson(json);
+    delete json.createdAt;
+    delete json.updatedAt;
+    return json;
+  }
+
   static get relationMappings() {
     const User = require("./user.model");
     const Table = require("./table.model");

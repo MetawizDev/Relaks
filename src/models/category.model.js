@@ -5,6 +5,13 @@ class Category extends Model {
     return "category";
   }
 
+  $formatJson(json) {
+    json = super.$formatJson(json);
+    delete json.createdAt;
+    delete json.updatedAt;
+    return json;
+  }
+
   static relationMappings() {
     const FoodItem = require("./food-item.model");
     return {
