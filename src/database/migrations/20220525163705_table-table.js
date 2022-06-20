@@ -3,7 +3,7 @@ const tableName = "table";
 exports.up = function (knex) {
   return knex.schema.createTable(tableName, (table) => {
     table.increments("id").primary();
-    table.integer("table_no", 25).notNullable().unique();
+    table.string("table_name", 25).notNullable().unique();
     table.integer("seating_capacity").notNullable();
     table.boolean("is_indoor").notNullable();
 

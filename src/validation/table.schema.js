@@ -2,12 +2,12 @@ const Joi = require("joi");
 
 const Schema = {
   postTable: Joi.object({
-    tableNo: Joi.number().required(),
+    tableName: Joi.string().required(),
     seatingCapacity: Joi.number().required(),
     isIndoor: Joi.boolean().required(),
   }),
   patchTable: Joi.object({
-    tableNo: Joi.number(),
+    tableName: Joi.string(),
     seatingCapacity: Joi.number(),
     isIndoor: Joi.boolean(),
   }),

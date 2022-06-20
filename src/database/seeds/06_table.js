@@ -6,18 +6,18 @@ exports.seed = function (knex) {
       // Inserts seed entries
       return knex("table").insert([
         {
-          table_no: 1,
-          seating_capacity: 4,
+          table_name: "Couple Table A",
+          seating_capacity: 2,
           is_indoor: true,
         },
         {
-          table_no: 2,
+          table_name: "Fourperson Table A",
           seating_capacity: 4,
           is_indoor: false,
         },
         {
-          table_no: 3,
-          seating_capacity: 4,
+          table_name: "Triple Table A",
+          seating_capacity: 3,
           is_indoor: true,
         },
       ]);

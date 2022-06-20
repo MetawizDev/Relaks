@@ -29,12 +29,12 @@ exports.createTableHandler = () => {
   return async (req, res, next) => {
     try {
       const data = {
-        tableNo: req.body.tableNo,
+        tableName: req.body.tableName,
         isIndoor: req.body.isIndoor,
         seatingCapacity: req.body.seatingCapacity,
       };
       // Check for existing table
-      if (await tableService.getTable("tableNo", data.tableNo)) throw new ConflictException("Table already exists!");
+      if (await tableService.getTable("tableName", data.tableName)) throw new ConflictException("Table already exists!");
 
       // Create table
       const table = await tableService.createTable(data);
@@ -181,7 +181,7 @@ exports.delete_table = async (req, res, next) => {
 exports.update_table = async (req, res, next) => {
   const tableId = req.params.id;
 
-  const { tableNo, seatingCapacity, isIndoor } = req.body;
+  const { tableName, seatingCapacity, isIndoor } = req.body;
 
   try {
     await Table.query().findById(tableId).throwIfNotFound({ message: "Table does not exist." });
@@ -193,7 +193,7 @@ exports.update_table = async (req, res, next) => {
     }
 
     if (canUpdate) {
-      const updatedTable = await Table.query().patchAndFetchById(tableId, { tableNo, seatingCapacity, isIndoor });
+      const updatedTable = await Table.query().patchAndFetchById(tableId, { tableName, seatingCapacity, isIndoor });
       res.status(200).json({ message: "Table updated successfully", updatedTable });
     } else {
       throw new NotAcceptableException("Table has reservations. Cannot update.");
