@@ -12,7 +12,7 @@ const createUser = async (data) => {
 };
 
 const updateUser = async (id, data) => {
-  return await User.query().findById(id).patch(data);
+  return await User.query().patchAndFetchById(id, data);
 };
 
 const comparePassword = async (password, hash) => {
@@ -22,8 +22,8 @@ const comparePassword = async (password, hash) => {
 const saveResetToken = async (token, username) => {
   const salt = await bcrypt.genSalt();
   const hashedToken = await bcrypt.hash(token, salt);
-  return await User.query().patch({ resetToken: hashedToken }).where('username', '=', username);
-}
+  return await User.query().patch({ resetToken: hashedToken }).where("username", "=", username);
+};
 
 module.exports = {
   getUser,

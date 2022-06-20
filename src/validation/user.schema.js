@@ -21,6 +21,12 @@ const Schema = {
       .pattern(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,64})/)
       .required(),
   }),
+  updateUser: Joi.object({
+    firstName: Joi.string().alphanum().min(3).max(25),
+    lastName: Joi.string().alphanum().min(3).max(25),
+    password: Joi.string().pattern(/((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[\W]).{8,64})/),
+    mobile: Joi.string().pattern(new RegExp("^[0-9]{10}$")),
+  }),
 };
 
 module.exports = Schema;

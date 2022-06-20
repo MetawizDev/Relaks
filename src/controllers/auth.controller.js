@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const env = require("../configs");
-const crypto = require('crypto');
+const crypto = require("crypto");
 
 const ConflictException = require("../common/exceptions/ConflictException");
 const UnauthorizedException = require("../common/exceptions/UnauthorizedException");
@@ -8,7 +8,7 @@ const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
 
 const authService = require("../services/auth.service");
-const mailConfig = require('../configs/mailConfig');
+const mailConfig = require("../configs/mailConfig");
 
 const roles = require("../models/roles");
 const loginType = require("../models/loginType");
@@ -24,7 +24,7 @@ const userRegisterHandler = (role) => {
       req.body.role = role;
       if (role === roles.MANAGER) req.body.isActive = true;
       req.body.username = req.body.email;
-      let user = await authService.createUser({...req.body, loginType: loginType.EMAIL});
+      let user = await authService.createUser({ ...req.body, loginType: loginType.EMAIL });
 
       res.status(201).json({
         message: `${role} created successfully.`,
@@ -32,8 +32,8 @@ const userRegisterHandler = (role) => {
         data: user,
       });
 
-      const body = `Welcome to Relaks. Your account has been created.`
-      await mailConfig.sendMail('Hello from Relaks team!', body, req.body.email);
+      const body = `Welcome to Relaks. Your account has been created.`;
+      await mailConfig.sendMail("Hello from Relaks team!", body, req.body.email);
     } catch (error) {
       next(error);
     }
@@ -63,7 +63,7 @@ const userLoginHandler = () => {
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        loginType: user.loginType
+        loginType: user.loginType,
       };
 
       res.status(200).json({
@@ -82,6 +82,12 @@ const userLoginHandler = () => {
 const userUpdateHandler = () => {
   return async (req, res, next) => {
     try {
+      if (req.body.mobile) {
+        if (await authService.getUser("mobile", req.body.mobile)) {
+          throw new ConflictException("A user already exist with the given mobile!");
+        }
+      }
+
       const user = await authService.updateUser(req.user.id, req.body);
 
       res.status(200).json({
@@ -106,63 +112,59 @@ const facebookSuccessLoginHandler = (req, res, next) => {
     message: "Facebook login success",
     accessToken,
     expiresIn: process.env.TOKEN_VALIDITY,
-    loginType: req.user.loginType
+    loginType: req.user.loginType,
   });
 };
 
 const requestPasswordReset = async (req, res, next) => {
   const username = req.query.email;
   try {
-    const user = await authService.getUser('username', username);
-    if(!user) throw new NotFoundException(`User not found with username ${username}`);
+    const user = await authService.getUser("username", username);
+    if (!user) throw new NotFoundException(`User not found with username ${username}`);
 
-    
-    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetToken = crypto.randomBytes(32).toString("hex");
 
     await authService.saveResetToken(resetToken, username);
     console.log(resetToken);
 
-    const host = req.get('host');
+    const host = req.get("host");
     const url = `${host}/password-reset?token=${resetToken}&username=${username}`;
 
-
-    const body = `Here is your password reset link. ${url}`
-    await mailConfig.sendMail('Password reset request from Relaks', body, username);
+    const body = `Here is your password reset link. ${url}`;
+    await mailConfig.sendMail("Password reset request from Relaks", body, username);
 
     res.status(200).json({
-      data: 'A password reset link has been set to your email.'
+      data: "A password reset link has been set to your email.",
     });
-
   } catch (error) {
     next(error);
   }
-}
+};
 
 const passwordReset = async (req, res, next) => {
   const { token, email: username, password } = req.body;
 
   try {
-    const user = await authService.getUser('username', username);
-    if(!user) throw new NotFoundException(`User not found with username ${username}`);
+    const user = await authService.getUser("username", username);
+    if (!user) throw new NotFoundException(`User not found with username ${username}`);
 
     // comparing the token, same as password
     const valid = await authService.comparePassword(token, user.resetToken);
 
-    if(!valid) throw new NotAcceptableException('Invalid reset token');
+    if (!valid) throw new NotAcceptableException("Invalid reset token");
 
     await authService.updateUser(user.id, { password });
 
     res.status(200).json({
-      message: 'Your password updated successfully'
+      message: "Your password updated successfully",
     });
 
-    const body = `Your password has been changed.`
-    await mailConfig.sendMail('Password reset Successful', body, username);
-    
+    const body = `Your password has been changed.`;
+    await mailConfig.sendMail("Password reset Successful", body, username);
   } catch (error) {
     next(error);
   }
-}
+};
 
 module.exports = {
   userRegisterHandler,
@@ -170,5 +172,5 @@ module.exports = {
   facebookSuccessLoginHandler,
   userUpdateHandler,
   requestPasswordReset,
-  passwordReset
+  passwordReset,
 };

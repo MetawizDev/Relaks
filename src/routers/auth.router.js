@@ -1,19 +1,12 @@
 const express = require("express");
-const { 
-  userRegisterHandler, 
-  userLoginHandler, 
-  facebookSuccessLoginHandler, 
-  userUpdateHandler, 
-  requestPasswordReset, 
-  passwordReset 
-} = require("../controllers/auth.controller");
+const { userRegisterHandler, userLoginHandler, facebookSuccessLoginHandler, userUpdateHandler, requestPasswordReset, passwordReset } = require("../controllers/auth.controller");
 const passport = require("passport");
 const jwt = require("jsonwebtoken");
 
 const userController = require("../controllers/user.controller");
 
 const ValidationMiddleware = require("../middlewares/validation.middleware");
-const { registerUser, loginUser, resetPasswordSchema } = require("../validation/user.schema");
+const { registerUser, loginUser, resetPasswordSchema, updateUser } = require("../validation/user.schema");
 const roles = require("../models/roles");
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 
@@ -31,7 +24,7 @@ AuthRouter.post("/password-reset", ValidationMiddleware(resetPasswordSchema), pa
 AuthRouter.post("/login", ValidationMiddleware(loginUser), userLoginHandler());
 
 // Update user routers
-AuthRouter.patch("/me", AuthorizationMiddleware([roles.OWNER, roles.MANAGER, roles.CUSTOMER]), userUpdateHandler());
+AuthRouter.patch("/me", AuthorizationMiddleware([roles.OWNER, roles.MANAGER, roles.CUSTOMER]), ValidationMiddleware(updateUser), userUpdateHandler());
 
 // facebook auth related
 AuthRouter.get("/facebook", passport.authenticate("facebook", { scope: ["email"] }));
@@ -85,6 +78,17 @@ module.exports = AuthRouter;
  *          password:
  *            type: string
  *            required: true
+ *      UserUpdate:
+ *        type: object
+ *        properties:
+ *          firstName:
+ *            type: string
+ *          lastName:
+ *            type: string
+ *          password:
+ *            type: string
+ *          mobile:
+ *            type: string
  */
 
 /**
@@ -150,6 +154,29 @@ module.exports = AuthRouter;
  *        401:
  *          description: Login failed
  *
+ * /api/v1/auth/me:
+ *    patch:
+ *      summary: Update logged in user details
+ *      tags:
+ *        - auth
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/UserUpdate'
+ *      responses:
+ *        201:
+ *          description: User update sucessfully
+ *        409:
+ *          description: User exist with same mobile
+ *        400:
+ *          description: Request body validation failed
+ *        403:
+ *          description: No access rights
+ *        401:
+ *          description: Authentication failed
+ *
  * /api/v1/auth/facebook:
  *    get:
  *      summary: Login using facebook - customer register only
@@ -164,7 +191,7 @@ module.exports = AuthRouter;
  *      - in: query
  *        name: email
  *        description: Email of the user
- * 
+ *
  *    post:
  *      summary: Send the password reset data
  *      tags:
