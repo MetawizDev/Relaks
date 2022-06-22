@@ -27,7 +27,7 @@ TableRouter.post("/reserve-table", AuthorizationMiddleware([roles.CUSTOMER]), Va
 TableRouter.get("/reserve-table/:id", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), tableController.update_reservation_status);
 
 //Get all reservations
-TableRouter.get("/reservations", AuthorizationMiddleware([roles.OWNER, roles.MANAGER]), tableController.getAllReservationsHandler());
+TableRouter.get("/reservations", AuthorizationMiddleware([roles.OWNER, roles.MANAGER, roles.CUSTOMER]), tableController.getAllReservationsHandler());
 
 //Get available tables given a time
 TableRouter.post("/available-tables", ValidationMiddleware(postAvailableTables), tableController.getAvailableTablesByTimeHandler());
@@ -148,7 +148,7 @@ module.exports = TableRouter;
  *
  * /api/v1/tables/reservations:
  *      get:
- *          summary: Get all reservations - owner, manager
+ *          summary: Get reservations - owner, manager, customer(can only get reservations by logged in customer)
  *          tags:
  *          - Tables
  *          responses:

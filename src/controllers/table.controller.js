@@ -53,8 +53,14 @@ exports.createTableHandler = () => {
 exports.getAllReservationsHandler = () => {
   return async (req, res, next) => {
     try {
-      // Get all reserved tables
-      const reservedTables = await tableService.getAllReservationsWithUser();
+      let reservedTables;
+      if (req.user.role === roles.MANAGER || req.user.role === roles.OWNER) {
+        // Get all reserved tables
+        reservedTables = await tableService.getAllReservationsWithUser();
+      }
+      if (req.user.role === roles.CUSTOMER) {
+        reservedTables = await tableService.getAllReservationsOfUser(req.user.id);
+      }
 
       res.status(201).json({
         message: "Table created successfully!",
