@@ -62,6 +62,8 @@ const userLoginHandler = () => {
       const data = {
         firstName: user.firstName,
         lastName: user.lastName,
+        email: user.email,
+        mobile: user.mobile,
         role: user.role,
         loginType: user.loginType,
       };
