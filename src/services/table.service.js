@@ -14,7 +14,7 @@ exports.getAllTables = async () => {
 };
 
 exports.getAllReservationsWithUser = async () => {
-  return TableUser.query().withGraphJoined("user").select("table_has_user.id", "table_has_user.checkIn", "table_has_user.checkOut");
+  return TableUser.query().withGraphJoined("[user,table]").select("table_has_user.id", "table_has_user.checkIn", "table_has_user.checkOut");
 };
 
 exports.getAllReservationsOfUser = async (id) => {
