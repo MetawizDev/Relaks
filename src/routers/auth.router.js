@@ -10,6 +10,8 @@ const { registerUser, loginUser, resetPasswordSchema, updateUser } = require("..
 const roles = require("../models/roles");
 const { AuthorizationMiddleware } = require("../middlewares/authorization.middleware");
 
+const GoogleAuthRouter = require("./googleAuth.router");
+
 const AuthRouter = express.Router();
 
 // Register Routers
@@ -44,6 +46,8 @@ AuthRouter.get("/fail", (req, res, next) => {
 });
 
 // http://localhost:3000/api/v1/auth/facebook
+
+AuthRouter.use("/google", GoogleAuthRouter);
 
 module.exports = AuthRouter;
 
@@ -182,6 +186,13 @@ module.exports = AuthRouter;
  *      summary: Login using facebook - customer register only
  *      tags:
  *        - auth
+ *
+ * /api/v1/auth/google:
+ *    get:
+ *      summary: Login using google - customer register only
+ *      tags:
+ *        - auth
+ *
  * /api/v1/auth/password-reset:
  *    get:
  *      summary: Request for a password reset link

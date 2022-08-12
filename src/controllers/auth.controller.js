@@ -118,6 +118,38 @@ const facebookSuccessLoginHandler = (req, res, next) => {
   });
 };
 
+const googleSuccessLoginHandler = () => {
+  return async (req, res, next) => {
+    try {
+      if (!req.user) {
+        throw new UnauthorizedException("You are not logged in!");
+      }
+      const token = jwt.sign({ username: req.user.username }, env.SECRET, {
+        expiresIn: env.TOKEN_VALIDITY,
+      });
+
+      res.status(200).json({
+        message: "Google login success",
+        token,
+        expiresIn: process.env.TOKEN_VALIDITY,
+        loginType: req.user.loginType,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
+const googleFailedLoginHandler = () => {
+  return async (req, res, next) => {
+    try {
+      throw new UnauthorizedException("Google login failed!");
+    } catch (error) {
+      next(error);
+    }
+  };
+};
+
 const requestPasswordReset = async (req, res, next) => {
   const username = req.query.email;
   try {
@@ -172,6 +204,8 @@ module.exports = {
   userRegisterHandler,
   userLoginHandler,
   facebookSuccessLoginHandler,
+  googleSuccessLoginHandler,
+  googleFailedLoginHandler,
   userUpdateHandler,
   requestPasswordReset,
   passwordReset,

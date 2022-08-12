@@ -21,6 +21,9 @@ const env = cleanEnv(process.env, {
   AWS_BUCKET_NAME: str(),
   MAIL: str(),
   MAILPASSWORD: str(),
+  GOOGLE_CLIENT_ID: str(),
+  GOOGLE_CLIENT_SECRET: str(),
+  GOOGLE_CALLBACK_URL: str(),
 });
 
 module.exports = env;
