@@ -128,9 +128,9 @@ const googleSuccessLoginHandler = () => {
         expiresIn: env.TOKEN_VALIDITY,
       });
 
-      const redirectURL = `https://relakscafe?message=success&token=${token}&loginType=${req.user.loginType}`;
+      // const redirectURL = `https://relakscafe?message=success&token=${token}&loginType=${req.user.loginType}`;
 
-      res.status(200).end(`<a href="${redirectURL}"><button>Return to Application</button></a>`);
+      res.status(200).end(`<a href="relakscafe://googleauth?message=success&token=${token}&loginType=${req.user.loginType}"><button>Return to Application</button></a>`);
 
       // res.status(200).json({
       //   message: "Google login success",
