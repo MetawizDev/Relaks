@@ -57,7 +57,7 @@ GoogleAuthRouter.get("/", passport.authenticate("google", { scope: ["profile", "
 GoogleAuthRouter.get(
   "/callback",
   passport.authenticate("google", {
-    successRedirect: "/api/v1/auth/google/success",
+    successRedirect: "relaks_cafe://google_auth",
     failureRedirect: "/api/v1/auth/google/fail",
   })
 );
