@@ -130,7 +130,7 @@ const googleSuccessLoginHandler = () => {
 
       const redirectURL = `relaks_cafe://google_auth?message=success&token=${token}&loginType=${req.user.loginType}`;
 
-      res.status(200).end(`<a href="${redirectURL}><button>Return to Application</button></a>`);
+      res.status(200).end(`<a href="${redirectURL}"><button>Return to Application</button></a>`);
 
       // res.status(200).json({
       //   message: "Google login success",
