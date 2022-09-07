@@ -128,12 +128,16 @@ const googleSuccessLoginHandler = () => {
         expiresIn: env.TOKEN_VALIDITY,
       });
 
-      res.status(200).json({
-        message: "Google login success",
-        token,
-        expiresIn: process.env.TOKEN_VALIDITY,
-        loginType: req.user.loginType,
-      });
+      const redirectURL = `relaks_cafe://google_auth?message=success&token=${token}&loginType=${req.user.loginType}`;
+
+      res.status(200).end(`<a href="${redirectURL}><button>Return to Application</button></a>`);
+
+      // res.status(200).json({
+      //   message: "Google login success",
+      //   token,
+      //   expiresIn: process.env.TOKEN_VALIDITY,
+      //   loginType: req.user.loginType,
+      // });
     } catch (error) {
       next(error);
     }
