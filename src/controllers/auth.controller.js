@@ -128,16 +128,13 @@ const googleSuccessLoginHandler = () => {
         expiresIn: env.TOKEN_VALIDITY,
       });
 
-      // const redirectURL = `https://relakscafe?message=success&token=${token}&loginType=${req.user.loginType}`;
+      const firstName = req.user.first_name,
+        lastName = req.user.last_name,
+        email = req.user.email,
+        mobile = req.user.mobile,
+        role = req.user.role;
 
-      res.status(200).end(`<a href="relakscafe://googleauth?message=success&token=${token}&loginType=${req.user.loginType}"><button>Return to Application</button></a>`);
-
-      // res.status(200).json({
-      //   message: "Google login success",
-      //   token,
-      //   expiresIn: process.env.TOKEN_VALIDITY,
-      //   loginType: req.user.loginType,
-      // });
+      res.status(200).end(`<a href="relakscafe://googleauth?message=success&token=${token}&loginType=${loginType}?firstName=${firstName}?lastName=${lastName}?email=${email}?mobile=${mobile}?role=${role}=$"><button>Return to Application</button></a>`);
     } catch (error) {
       next(error);
     }
