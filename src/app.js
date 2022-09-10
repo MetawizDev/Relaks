@@ -3,6 +3,7 @@ const ExceptionHandler = require("./common/handlers/exception.handler");
 const RouteNotFoundHandler = require("./common/handlers/route-not-found.handler");
 const { knexConnection, initDatabase } = require("./database");
 const cors = require("cors");
+const path = require("path");
 
 const swaggerJSDoc = require("swagger-jsdoc");
 const swaggerUi = require("swagger-ui-express");
@@ -24,6 +25,9 @@ const trendingRouter = require("./routers/trending.router");
 const socketServer = require("./configs/socketConfig");
 
 const app = express();
+
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "/views"));
 
 const httpServer = require("http").Server(app);
 
@@ -57,6 +61,7 @@ app.get("/", (req, res, next) => {
 });
 
 // Routers
+
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use("/health", HealthCheckRouter);
 app.use("/api/v1/auth", AuthRouter);

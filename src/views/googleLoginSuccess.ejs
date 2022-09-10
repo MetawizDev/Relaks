@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Return to app</title>
+    <style>
+      .button {
+        background-color: red;
+        width: 100%;
+        color: black;
+        padding: 15px 32px;
+        text-align: center;
+        font-weight: bold;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Login successful!</h1>
+    <p>Click the button below to return to the application...</p>
+    <a href="<%= `relakscafe://googleauth?message=success&token=${token}&loginType=${loginType}&firstName=${firstName}&lastName=${lastName}&email=${email}&mobile=${mobile}&role=${role}`%>"><button class="button">Return to Application</button></a>
+  </body>
+</html>

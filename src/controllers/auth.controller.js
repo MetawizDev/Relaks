@@ -128,13 +128,18 @@ const googleSuccessLoginHandler = () => {
         expiresIn: env.TOKEN_VALIDITY,
       });
 
-      const firstName = req.user.first_name,
-        lastName = req.user.last_name,
-        email = req.user.email,
-        mobile = req.user.mobile,
-        role = req.user.role;
+      const userdata = {
+        token,
+        message: "success",
+        loginType: loginType.GOOGLE,
+        firstName: req.user.first_name,
+        lastName: req.user.last_name,
+        email: req.user.email,
+        mobile: req.user.mobile,
+        role: req.user.role,
+      };
 
-      res.status(200).end(`<a href="relakscafe://googleauth?message=success&token=${token}&loginType=${loginType}?firstName=${firstName}?lastName=${lastName}?email=${email}?mobile=${mobile}?role=${role}=$"><button>Return to Application</button></a>`);
+      res.status(200).render("googleLoginSuccess", userdata);
     } catch (error) {
       next(error);
     }
