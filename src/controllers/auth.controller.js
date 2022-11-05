@@ -6,6 +6,7 @@ const ConflictException = require("../common/exceptions/ConflictException");
 const UnauthorizedException = require("../common/exceptions/UnauthorizedException");
 const NotFoundException = require("../common/exceptions/NotFoundException");
 const NotAcceptableException = require("../common/exceptions/NotAcceptableException");
+const ValidationException = require("../common/exceptions/ValidationException");
 
 const authService = require("../services/auth.service");
 const mailConfig = require("../configs/mailConfig");
@@ -159,6 +160,9 @@ const googleFailedLoginHandler = () => {
 const requestPasswordReset = async (req, res, next) => {
   const username = req.query.email;
   try {
+    if (!username) {
+      throw new ValidationException([{ message: "Invlalid query parameters!" }]);
+    }
     const user = await authService.getUser("username", username);
     if (!user) throw new NotFoundException(`User not found with username ${username}`);
 
@@ -168,7 +172,7 @@ const requestPasswordReset = async (req, res, next) => {
     console.log(resetToken);
 
     const host = req.get("host");
-    const url = `${host}/password-reset?token=${resetToken}&username=${username}`;
+    const url = `https://${host}/api/v1/auth/password-reset?token=${resetToken}&username=${username}`;
 
     const body = `Here is your password reset link. ${url}`;
     await mailConfig.sendMail("Password reset request from Relaks", body, username);
