@@ -27,6 +27,7 @@ class User extends Model {
     delete json.username;
     delete json.createdAt;
     delete json.updatedAt;
+    delete json.resetToken;
     return json;
   }
 

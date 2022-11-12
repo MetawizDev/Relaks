@@ -1,10 +1,15 @@
 const bcrypt = require("bcrypt");
+const roles = require("../models/roles");
 const User = require("../models/user.model");
 
 const getUser = async (key, value) => {
   const user = await User.query().where(key, "=", value).first();
   return user;
 };
+
+const getAllCustomers = async () => {
+  return await User.query().where("role", "=", roles.CUSTOMER);
+}
 
 const createUser = async (data) => {
   const user = await User.query().insert(data);
@@ -31,4 +36,5 @@ module.exports = {
   comparePassword,
   updateUser,
   saveResetToken,
+  getAllCustomers
 };

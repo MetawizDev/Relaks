@@ -1,7 +1,7 @@
 const passport = require('passport');
 const strategy = require('passport-facebook');
 const UnauthorizedException = require('../common/exceptions/UnauthorizedException');
-const { getUser } = require("../services/auth.service");
+const authService = require("../services/auth.service");
 const User = require('../models/user.model');
 const roles = require('../models/roles');
 const loginType = require('../models/loginType');
@@ -35,7 +35,7 @@ passport.use(new FacebookStrategy(
     };
 
     try {
-      const existingUser = await getUser("username", id);
+      const existingUser = await authService.getUser("username", id);
       if(existingUser) {
         return done(null, { email, id, loginType: loginType.FACEBOOK });
       } 
@@ -48,3 +48,18 @@ passport.use(new FacebookStrategy(
     }
   }
 ));
+
+exports.get_all_customers = async (req, res, next) => {
+  try {
+    const customers = await authService.getAllCustomers();
+    res.status(200).json({
+      message: 'Customers fetched successfully',
+      count: customers.length,
+      success: true,
+      data: customers
+    });
+    
+  } catch (error) {
+    next(error);
+  }
+} 
